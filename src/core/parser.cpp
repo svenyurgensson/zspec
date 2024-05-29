@@ -130,7 +130,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
 
 void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTest * test) {
     if (!exp_regs.is_table())        
-    std::cout << "exp regs: " << exp_regs << "\n";
+        std::cout << "exp regs: " << exp_regs << "\n";
     exp_regs.as_table()->for_each([&test](auto& key, auto& val) {
         std::string current_reg = string_tolower((std::string)key.str());
         if (!(val.is_integer() || val.is_boolean()))
@@ -173,12 +173,68 @@ void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTes
 }
 
 void build_test_expect_memory(toml::node_view<toml::node> section, SingleTest * test) {
+    if (!section.is_array_of_tables()) return;
 
-} // TODO test.expect_mem
+    section.as_array()->for_each([&test](auto& el) {
+        auto address   = el.at_path("address").template value<int64_t>();
+        auto value     = el.at_path("value").template value<int64_t>();
+        auto value_not = el.at_path("value_not").template value<int64_t>();
+        
+        if (!address.has_value())
+            fail(string_format("Error in test: '%s'. Memory expectation must have 'address' to check!", test->name.c_str())); 
+        int addr = * address;
+        if (addr > MAX_LOAD_ADDRESS || addr < 0)
+            fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), addr, MAX_LOAD_ADDRESS)); 
+
+        if (value.has_value() && value_not.has_value())
+            fail(string_format("Error in test: '%s'. Memory expectation 'value' and 'value_not' cannot be defined simultaneously!", test->name.c_str()));     
+        if (!value.has_value() && !value_not.has_value())
+            fail(string_format("Error in test: '%s'. Memory expectation 'value' or 'value_not' have to be defined!", test->name.c_str()));     
+
+        TestExpectMemory expm;
+
+        if (value.has_value()) {
+            int val = * value;
+            if (val > 0xFF || addr < 0)
+                fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds 0xFF!", test->name.c_str(), val)); 
+            expm = TestExpectMemory{ .address = addr, .value = val };
+        }
+        if (value_not.has_value()) {
+            int val = * value_not;
+            if (val > 0xFF || addr < 0)
+                fail(string_format("Error in test: '%s'. Memory expectation 'value_not'=%d exceeds 0xFF!", test->name.c_str(), val)); 
+            expm = TestExpectMemory{ .address = addr, .value_not = val };
+        }
+
+        test->memory_expectations.push_back(expm);
+    });
+} 
 
 void build_test_expect_ports(toml::node_view<toml::node> section, SingleTest * test) {
+    
 
 } // TODO test.expect_port
+
+void build_test_expect_timing(toml::node_view<toml::node> section, SingleTest * test) {
+    auto max_ticks = section["max_ticks"].value<int64_t>();
+    auto exact_ticks = section["exact_ticks"].value<int64_t>();
+
+    if (max_ticks.has_value()) {
+        if (exact_ticks.has_value())
+            fail(string_format("Error in test: '%s'. Cannot have set both 'max_ticks' and 'exact_ticks'!", test->name.c_str())); 
+        
+        if (*max_ticks >= MAX_CPU_TICKS_PER_TEST || *max_ticks < 4)
+            fail(string_format("Error in test: '%s'. 'max_ticks' set to: %d, but maximum allowed is: %d and minimum is: 4!", test->name.c_str(), *max_ticks, MAX_CPU_TICKS_PER_TEST));         
+
+        test->expect_timing.max_tick = *max_ticks;
+    } else if (exact_ticks.has_value()) {
+
+        if (*exact_ticks >= MAX_CPU_TICKS_PER_TEST || *exact_ticks < 4)
+            fail(string_format("Error in test: '%s'. 'exact_ticks' set to: %d, but maximum allowed is: %d and minimum is: 4!", test->name.c_str(), *exact_ticks, MAX_CPU_TICKS_PER_TEST)); 
+
+        test->expect_timing.exact_tick = *exact_ticks;
+    }
+}
 
 void set_precondition_reg(std::string current_reg, int value, SingleTest * test) {
     std::cout << "set reg: " << current_reg << " = 0x" << std::hex << value << "\n";
@@ -217,11 +273,20 @@ void handle_tests(toml::node_view<toml::node> test_section) {
     if (!test_section.is_array_of_tables()) fail("'[[test]]' section(s) not found!");
 
     test_section.as_array()->for_each([](auto& section, int test_idx) {
-        SingleTest test = {};
+        SingleTest test = { .is_skipped = false };
+        const toml::table& sec = *section.as_table();
 
-        auto test_name = section.at_path("name").value_or(string_format("test_%d", test_idx + 1));
-        test.name = test_name;
-        std::cout << "Current test: " << test_name << "\n";
+        auto test_name = sec["name"].value_or(string_format("test_%d", test_idx + 1));
+        test.name = test_name.c_str();
+
+        auto skipped_name = sec["xname"].value_or("#"sv);
+        if (sec["xname"].is_string()) {
+            test.is_skipped = true;
+            test.name = skipped_name;
+            std::cout << "Current test: " << Colors::BLUE << test.name  << " (skipped)" << Colors::RESET << "\n";
+        } else {
+            std::cout << "Current test: " << test.name  << "\n";
+        }
 
         // set registers 
         // TODO: fix setting precondition registers
@@ -242,7 +307,7 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         if (init_section.is_table() && !init_section.as_table()->empty()) {
             build_test_init(init_section, &test);
         } else {
-            std::cout << "No init section for test: '" << test_name << "'\n";
+            std::cout << "No init section for test: '" << test.name << "'\n";
         }
         
         auto run_section = section.at_path("run");
@@ -256,8 +321,11 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         auto expect_memory_section = expect_section.at_path("memory");
         build_test_expect_memory(expect_memory_section, &test);
 
-        auto expect_ports_section = expect_section.at_path("ports");
+        auto expect_ports_section = expect_section.at_path("port");
         build_test_expect_ports(expect_ports_section, &test);
+
+        auto expect_timing_section = expect_section.at_path("timing");
+        build_test_expect_timing(expect_timing_section, &test);
 
         test_idx++; 
         zspec_suit.tests_list.push_back(test);

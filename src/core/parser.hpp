@@ -11,3 +11,4 @@ void config_parser(const char* path);
 
 constexpr int MAX_LOAD_ADDRESS = 0xFFFF;
 constexpr int MAX_BIN_SIZE = 0x10000;
+constexpr int MAX_CPU_TICKS_PER_TEST = 500000;

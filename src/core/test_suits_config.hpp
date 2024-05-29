@@ -52,6 +52,11 @@ struct TestExpectRegisters {
     int reg_sp = -1;      
 };
 
+struct TestExpectTiming {
+    int max_tick = -1;
+    int exact_tick = -1;
+};
+
 struct TestMemoryState {
     int address = -1;
     int value = -1;
@@ -87,6 +92,7 @@ struct TestResult {
 
 struct SingleTest {
     std::string name;
+    bool is_skipped = false;
     TestRun test_run;
     TestPreconditions preconditions;
     TestInit initializer;
@@ -94,6 +100,7 @@ struct SingleTest {
     TestExpectRegisters expect_registers;
     std::vector<TestExpectMemory> memory_expectations;
     std::vector<TestExpectPort> ports_expectations;
+    TestExpectTiming expect_timing;
 
     TestResult result;
 };
@@ -101,6 +108,7 @@ struct SingleTest {
 struct ZTest {
     MemoryImage memory_image;
     std::vector<SingleTest> tests_list;
+    int skipped = 0;
 };
 
 const std::string REGISTERS[] = { "a", "h", "l", "b", "c", "d", "e",

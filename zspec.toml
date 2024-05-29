@@ -7,7 +7,8 @@ load_addr = 0xC000
 labels_file = "examples/main.lbl"
 
 [[test]]
-    name = "Деление на 2. Должен вернуть флаги Z"
+    xname = "Деление на 2. Должен вернуть флаги Z"
+    # or xname to skip it
 
     # test preconditions
     # setting registers
@@ -37,16 +38,18 @@ labels_file = "examples/main.lbl"
         fl_z = true
         a = 0x00
     [[test.expect.memory]]
-        address = 0x00 
+        address = 0xff00 
         value = 0x22
     [[test.expect.memory]]
         address = 0x10
-        value_not = 0x22
+        value_not = 0xcf
     [[test.expect.port]]
         address = 0x1aaf 
         value = 0x00
         series = [0x22, 0xff, 0x00]
-
+    [test.expect.timing]
+        max_ticks = 400
+        #exact_ticks = 198
 [[test]]
     name = "Second"
     de = 0x1245
