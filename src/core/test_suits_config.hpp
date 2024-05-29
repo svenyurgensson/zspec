@@ -1,0 +1,115 @@
+#pragma once
+
+struct PredefinedConstant {
+    std::string name;
+    int64_t value;
+};
+
+struct MemoryImage {
+    int load_addr = 0;
+    std::string bin_file;
+    int size = 65536;
+    char mem[65535];
+
+    std::vector<PredefinedConstant> constants;
+}; 
+
+struct TestClear {
+    int start = -1;
+    int end = -1;
+    int fill = -1;
+};
+
+struct InitMemory {
+    int start = -1;
+    std::vector<int> fill;    
+};
+
+struct FileInitMemory {
+    int start = -1;
+    int size = -1;
+    int offset = -1;
+    std::string filename;
+    char content[65535];
+};
+
+struct TestInit {
+    TestClear test_clear;
+    std::vector<InitMemory> memory_initializers;
+    std::vector<FileInitMemory> file_initializers;
+};
+
+struct TestRun {
+    std::string name;
+    int call = -1;
+    int max_ticks = -1;
+};
+
+struct TestExpectRegisters {
+    int fl_z = -1, fl_p = -1, fl_c = -1;
+    int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1; 
+    int reg_b = -1, reg_b_ = -1, reg_c = -1, reg_c_ = -1, reg_d = -1, reg_d_ = -1,  reg_e = -1, reg_e_ = -1;
+    int reg_sp = -1;      
+};
+
+struct TestMemoryState {
+    int address = -1;
+    int value = -1;
+};
+
+struct TestExpectMemory {
+    int address = -1;
+    int value = -1;
+    int value_not = -1;
+};
+
+struct TestExpectPort {
+    int address = -1;
+    int value = -1;
+    std::vector<uint8_t> series;
+};
+
+struct TestPreconditions {
+    int fl_z = -1, fl_p = -1, fl_c = -1;
+    int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1; 
+    int reg_b = -1, reg_b_ = -1, reg_c = -1, reg_c_ = -1, reg_d = -1, reg_d_ = -1,  reg_e = -1, reg_e_ = -1;
+    int reg_sp = -1;   
+
+    std::vector<TestMemoryState> memory_states;
+};
+
+enum TRESULT { PASS, FAIL, ERROR, SKIP };
+
+struct TestResult {
+    TRESULT code;
+    std::vector<std::string> results;
+};
+
+struct SingleTest {
+    std::string name;
+    TestRun test_run;
+    TestPreconditions preconditions;
+    TestInit initializer;
+
+    TestExpectRegisters expect_registers;
+    std::vector<TestExpectMemory> memory_expectations;
+    std::vector<TestExpectPort> ports_expectations;
+
+    TestResult result;
+};
+
+struct ZTest {
+    MemoryImage memory_image;
+    std::vector<SingleTest> tests_list;
+};
+
+const std::string REGISTERS[] = { "a", "h", "l", "b", "c", "d", "e",
+                                "a_", "h_", "l_", "b_", "c_", "d_", "e_",
+                                "hl", "hl_", "bc", "bc_", "de", "de_", "sp",
+                                "fl_z", "fl_p", "fl_c" };
+
+// For keeping pristine memory image between tests
+static MemoryImage orgiginal_memory_image;
+static std::string labels_file;
+// here tests lives
+static ZTest zspec_suit;

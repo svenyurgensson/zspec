@@ -1,0 +1,53 @@
+[init]
+    const.fun_1 = 0x1014
+    const.fun_2 = 65525
+
+bin_file = "examples/main.bin"
+load_addr = 0xC000
+labels_file = "examples/main.lbl"
+
+[[test]]
+    name = "Деление на 2. Должен вернуть флаги Z"
+
+    # test preconditions
+    # setting registers
+    bc = 0x1245
+    a = 100
+    fl_z = false
+
+    [test.init]
+        clear.start = 0x0000
+        clear.end = 0x4000
+        clear.fill = 0x00
+        [[test.init.memory]]
+            start = 0xc000
+            fill = [0, 100, 2, 3, 4]
+        [[test.init.memory]]
+            start = 0x8000
+            fill = [1]
+            size = 256
+            offset = 0
+            #file = "initial_8000.bin"
+    [test.run]
+        fname = "fun_1"
+        call = 0x3345
+        max_ticks = 10000
+
+    [test.expect.registers]
+        fl_z = true
+        a = 0x00
+    [[test.expect.memory]]
+        address = 0x00 
+        value = 0x22
+    [[test.expect.memory]]
+        address = 0x10
+        value_not = 0x22
+    [[test.expect.port]]
+        address = 0x1aaf 
+        value = 0x00
+        series = [0x22, 0xff, 0x00]
+
+[[test]]
+    name = "Second"
+    de = 0x1245
+    a = 0x44

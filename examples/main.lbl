@@ -1,0 +1,16 @@
+al c000 .main
+al c00d ._en__00019_il__00018_dma_loop
+al c041 ._wh__00022
+al c044 .TS_ClearSpritesFile
+al c045 .TS_ClearSpritesFile___clean_l1
+al c04a .TS_ClearSpritesFile___clean_l2
+al c050 .tiles_gen
+al c056 .call
+al c058 .TS_BurstPacketSend
+al c05a .TS_BurstPacketSend___m
+al c062 .sprites_off
+al c07c .sprites_gen
+al c088 .font_conversion
+al c0cb .clear_tiles_packet_array
+al c0de .__readline_out_array
+al c10b .TS_SYSTEM_state
