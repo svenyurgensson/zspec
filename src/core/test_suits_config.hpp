@@ -117,7 +117,8 @@ const std::string REGISTERS[] = { "a", "h", "l", "b", "c", "d", "e",
                                 "fl_z", "fl_p", "fl_c" };
 
 // For keeping pristine memory image between tests
-static MemoryImage orgiginal_memory_image;
+static MemoryImage original_memory_image;
+// labels filepath
 static std::string labels_file;
 // here tests lives
 static ZTest zspec_suit;

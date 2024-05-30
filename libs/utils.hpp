@@ -6,30 +6,49 @@
 #include <cstdio>
 #include <type_traits>
 
-std::string string_toupper(std::string s) {
+
+static std::vector<std::string> split_string(std::string str, char splitter) {
+    std::vector<std::string> result;
+    std::string current = ""; 
+    for(int i = 0; i < str.size(); i++){
+        if(str[i] == splitter){
+            if(current != ""){
+                result.push_back(current);
+                current = "";
+            } 
+            continue;
+        }
+        current += str[i];
+    }
+    if(current.size() != 0)
+        result.push_back(current);
+    return result;
+}
+
+static inline std::string string_toupper(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(), 
                    [](unsigned char c){ return std::toupper(c); }
                   );
     return s;
 }
 
-std::string string_tolower(std::string s) {
+static inline std::string string_tolower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(), 
                    [](unsigned char c){ return std::tolower(c); }
                   );
     return s;
 }
 
-void fail(std::string str) {
+static inline void fail(std::string str) {
     std::cerr << Colors::RED << str << Colors::RESET;
     exit(1);
 }
 
-void warn(std::string str) {
+static inline void warn(std::string str) {
     std::cerr << Colors::YELLOW << str << Colors::RESET;
 }
 
-void fail_parse_error(toml::parse_error& err) {
+static inline void fail_parse_error(toml::parse_error& err) {
     std::cerr
         << Colors::RED
         << "Error parsing file '" << *err.source().path
@@ -40,7 +59,7 @@ void fail_parse_error(toml::parse_error& err) {
 }
 
 template<typename T, typename ... Args>
-std::basic_string<T> string_format(T const* const format, Args ... args)
+static std::basic_string<T> string_format(T const* const format, Args ... args)
 {
     int size_signed{ 0 };
 
@@ -70,19 +89,19 @@ std::basic_string<T> string_format(T const* const format, Args ... args)
 
 // string_format("string. number %d.", 10)
 // TODO: add context!
-int check_8bit(int i) {
+static inline int check_8bit(int i) {
     if (i > 255 || i < 0) fail(string_format("%d is wrong 8-bit value!", i));
     return i;
 }
 
 // TODO: add context!
-int check_16bit(int i) {
+static inline int check_16bit(int i) {
     if (i > 65535 || i < 0) fail(string_format("%d is wrong 16-bit value!", i));
     return i;
 }
 
 // TODO: add context!
-int check_bit(int i) {
+static inline int check_bit(int i) {
     switch (i) {
         case 1: return 1;
         case 0: return 0;

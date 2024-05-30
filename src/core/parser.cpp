@@ -103,13 +103,13 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
     auto f_name = section.at_path("fname").template value<std::string>();
     if (f_name.has_value()) {
         const std::string fname = *f_name;
-        auto iter = std::find_if(orgiginal_memory_image.constants.begin(), orgiginal_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
+        auto iter = std::find_if(original_memory_image.constants.begin(), original_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
         
-        if (iter == orgiginal_memory_image.constants.end())
+        if (iter == original_memory_image.constants.end())
              fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str())); 
-        int index = std::distance(orgiginal_memory_image.constants.begin(), iter);                   
+        int index = std::distance(original_memory_image.constants.begin(), iter);                   
         constant_function_name = "(function: '" + fname + "')";
-        test->test_run.call = orgiginal_memory_image.constants[index].value;
+        test->test_run.call = original_memory_image.constants[index].value;
 
     } else {
         auto call = section.at_path("call").template value<int>();
@@ -125,7 +125,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
             fail(string_format("Start address or function to run is not found for test: %s", test->name.c_str()));
         }
     }
-    std::cout << "run at: 0x" << test->test_run.call << std::dec << " " << constant_function_name << "\n";
+    std::cout << "calling address: 0x" << test->test_run.call << std::dec << " " << constant_function_name << "\n";
 }
 
 void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTest * test) {
@@ -339,7 +339,7 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
     if (!load_addr.has_value()) fail("'load_address' not found in [init] section!");
     if (load_addr > MAX_LOAD_ADDRESS) fail(string_format("'load_address' exeeds maximum memory (%d) address!", MAX_LOAD_ADDRESS));
     if (load_addr < 0) fail("'load_address' cannot be less then 0!");
-    orgiginal_memory_image.load_addr = *load_addr;
+    original_memory_image.load_addr = *load_addr;
 
     // load content
     auto bin_file = init_section["bin_file"].value<std::string>();
@@ -355,13 +355,13 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
     if (size > MAX_BIN_SIZE) {
         fail(string_format("File 'bin_file' %s is too big (%d). Maximum is: %d", memory_image_file.c_str(), size, MAX_BIN_SIZE));
     }
-    int last_addr = orgiginal_memory_image.load_addr + size;
+    int last_addr = original_memory_image.load_addr + size;
     int diff = size - (last_addr - MAX_BIN_SIZE);
     if (size > MAX_BIN_SIZE) {
         fail(string_format("File 'bin_file' %s is too big (%d). Maximum is: %d", memory_image_file.c_str(), size, diff));
     }
     ifd.seekg(0, std::ios::beg);
-    ifd.read(&orgiginal_memory_image.mem[0], size);
+    ifd.read(&original_memory_image.mem[0], size);
     ifd.close();
 
     // defining consts
@@ -373,7 +373,7 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
                 exit(1);
             }
             PredefinedConstant pconst = { (std::string)key, (int64_t)value };
-            orgiginal_memory_image.constants.push_back(pconst);
+            original_memory_image.constants.push_back(pconst);
         } else {
             std::cerr << Colors::RED << "Constants can be only integers! Found: " << key << " = "sv << value << std::endl;
             exit(1);
@@ -390,12 +390,17 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
             fail(string_format("Cannot open 'labels_file' = %s", labels_file.c_str()));
         }
         int size = ifd.tellg();
-        ifd.seekg(0, std::ios::beg);
-        char labels[size];
-        ifd.read(&labels[0], size);
-        ifd.close();
+        if (size > MAX_LABELS_FILE_SIZE) 
+            fail(string_format("Labels file: %s is too big!", labels_file.c_str()));
 
-        // TODO: parse labels
+        ifd.seekg(0, std::ios::beg);
+
+        // parse labels
+        std::filesystem::path file_path = labels_file;   
+
+        labels_parser(&ifd, file_path.extension());
+        
+        ifd.close();
     }
 }
 

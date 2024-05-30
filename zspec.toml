@@ -4,7 +4,7 @@
 
 bin_file = "examples/main.bin"
 load_addr = 0xC000
-labels_file = "examples/main.lbl"
+labels_file = "examples/main.sld"
 
 [[test]]
     xname = "Деление на 2. Должен вернуть флаги Z"
