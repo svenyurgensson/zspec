@@ -153,6 +153,30 @@ src/core/parser.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/zspec.dir/build.make CMakeFiles/zspec.dir/src/core/parser.cpp.s
 .PHONY : src/core/parser.cpp.s
 
+src/core/test_spec_executor.o: src/core/test_spec_executor.cpp.o
+.PHONY : src/core/test_spec_executor.o
+
+# target to build an object file
+src/core/test_spec_executor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/zspec.dir/build.make CMakeFiles/zspec.dir/src/core/test_spec_executor.cpp.o
+.PHONY : src/core/test_spec_executor.cpp.o
+
+src/core/test_spec_executor.i: src/core/test_spec_executor.cpp.i
+.PHONY : src/core/test_spec_executor.i
+
+# target to preprocess a source file
+src/core/test_spec_executor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/zspec.dir/build.make CMakeFiles/zspec.dir/src/core/test_spec_executor.cpp.i
+.PHONY : src/core/test_spec_executor.cpp.i
+
+src/core/test_spec_executor.s: src/core/test_spec_executor.cpp.s
+.PHONY : src/core/test_spec_executor.s
+
+# target to generate assembly for a file
+src/core/test_spec_executor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/zspec.dir/build.make CMakeFiles/zspec.dir/src/core/test_spec_executor.cpp.s
+.PHONY : src/core/test_spec_executor.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -189,6 +213,9 @@ help:
 	@echo "... src/core/parser.o"
 	@echo "... src/core/parser.i"
 	@echo "... src/core/parser.s"
+	@echo "... src/core/test_spec_executor.o"
+	@echo "... src/core/test_spec_executor.i"
+	@echo "... src/core/test_spec_executor.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

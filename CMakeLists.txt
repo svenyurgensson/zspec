@@ -13,8 +13,9 @@ message (${CMAKE_CXX_COMPILER})
 add_compile_definitions(TOML_EXCEPTIONS=1)
 
 set(SOURCE_FILES
-    src/main.cpp
-    src/core/parser.cpp    
+    src/core/test_spec_executor.cpp  
+    src/core/parser.cpp
+    src/main.cpp  
 )
 set(INCLUDES "/usr/local/Cellar/gcc/14.1.0/include")
 

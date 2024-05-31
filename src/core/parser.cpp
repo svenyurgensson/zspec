@@ -1,5 +1,4 @@
 #include "parser.hpp"
-#include "../../libs/utils.hpp"
 
 // int result = tbl[section][entry].as_integer().operator const int64_t & ();
 
@@ -326,9 +325,12 @@ void handle_tests(toml::node_view<toml::node> test_section) {
 
         auto expect_timing_section = expect_section.at_path("timing");
         build_test_expect_timing(expect_timing_section, &test);
+        
+        zspec_suit.tests_list.push_back(test);
+
+        execute_test_spec(test_idx);
 
         test_idx++; 
-        zspec_suit.tests_list.push_back(test);
         std::cout << "\n";
     });
 }

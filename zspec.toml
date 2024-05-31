@@ -7,7 +7,7 @@ load_addr = 0xC000
 labels_file = "examples/main.sld"
 
 [[test]]
-    xname = "Деление на 2. Должен вернуть флаги Z"
+    name = "Деление на 2. Должен вернуть флаги Z"
     # or xname to skip it
 
     # test preconditions
@@ -30,7 +30,7 @@ labels_file = "examples/main.sld"
             offset = 0
             #file = "initial_8000.bin"
     [test.run]
-        fname = "fun_1"
+        fname = "tiles_gen"
         call = 0x3345
         max_ticks = 10000
 

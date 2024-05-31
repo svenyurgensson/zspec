@@ -5,6 +5,7 @@
 #include <cwchar>
 #include <cstdio>
 #include <type_traits>
+#include "toml.hpp"
 
 
 static std::vector<std::string> split_string(std::string str, char splitter) {

@@ -10,6 +10,5 @@ int main(int argc, char** argv) {
     }
 
     config_parser(path);  
-    // TODO: tests_run()
     // TODO: tests_results_print()      
 }
