@@ -9,7 +9,7 @@ struct MemoryImage {
     int load_addr = 0;
     std::string bin_file;
     int size = 65536;
-    char mem[65535];
+    char mem[0x10000];
 
     std::vector<PredefinedConstant> constants;
 }; 
@@ -108,7 +108,7 @@ struct SingleTest {
 struct ZTest {
     MemoryImage memory_image;
     std::vector<SingleTest> tests_list;
-    int skipped = 0;
+    int skipped_count = 0;
 };
 
 const std::string REGISTERS[] = { "a", "h", "l", "b", "c", "d", "e",

@@ -67,14 +67,14 @@ void build_test_init(toml::node_view<toml::node> section, SingleTest * test) {
                 std::ifstream ifd(image_file, std::ios::binary | std::ios::ate);
 
                 if (!ifd)
-                    fail(string_format("Cannot open 'file' %s!", image_file.c_str()));
+                    fail(string_format("Cannot open memory image file '%s'!", image_file.c_str()));
                 int size = ifd.tellg();
                 if (size + offset > MAX_BIN_SIZE)
-                    fail(string_format("File 'file' %s is too big (%d). Maximum is: %d", image_file.c_str(), size, MAX_BIN_SIZE));
+                    fail(string_format("File file '%s' is too big (%d). Maximum is: %d", image_file.c_str(), size, MAX_BIN_SIZE));
                 int last_addr = offset + size;
                 int diff = size - (last_addr - MAX_BIN_SIZE);
                 if (size > MAX_BIN_SIZE)
-                    fail(string_format("File 'file' %s is too big (%d). Maximum is: %d", image_file.c_str(), size, diff));
+                    fail(string_format("File file '%s' is too big (%d). Maximum is: %d", image_file.c_str(), size, diff));
 
                 ifd.seekg(0, std::ios::beg);
                 FileInitMemory fmem = { .start = (int)*start, .size = size, .offset = offset, .filename = image_file };
@@ -270,21 +270,26 @@ void set_precondition_reg(std::string current_reg, int value, SingleTest * test)
 
 void handle_tests(toml::node_view<toml::node> test_section) {
     if (!test_section.is_array_of_tables()) fail("'[[test]]' section(s) not found!");
+    std::cout << "\n";
 
     test_section.as_array()->for_each([](auto& section, int test_idx) {
         SingleTest test = { .is_skipped = false };
+
         const toml::table& sec = *section.as_table();
 
         auto test_name = sec["name"].value_or(string_format("test_%d", test_idx + 1));
         test.name = test_name.c_str();
 
+        std::printf("[test][%.3i]: ", test_idx+1);
+
         auto skipped_name = sec["xname"].value_or("#"sv);
         if (sec["xname"].is_string()) {
             test.is_skipped = true;
             test.name = skipped_name;
-            std::cout << "Current test: " << Colors::BLUE << test.name  << " (skipped)" << Colors::RESET << "\n";
+            std::cout << Colors::BLUE << test.name  << " (skipped)" << Colors::RESET << "\n";
+            return;
         } else {
-            std::cout << "Current test: " << test.name  << "\n";
+            std::cout << test.name  << "\n";
         }
 
         // set registers 
@@ -328,7 +333,7 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         
         zspec_suit.tests_list.push_back(test);
 
-        execute_test_spec(test_idx);
+        execute_test_spec(&test);
 
         test_idx++; 
         std::cout << "\n";

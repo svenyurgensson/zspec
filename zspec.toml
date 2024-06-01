@@ -8,12 +8,13 @@ labels_file = "examples/main.sld"
 
 [[test]]
     name = "Деление на 2. Должен вернуть флаги Z"
-    # or xname to skip it
+    # rename to xname to skip it
 
     # test preconditions
     # setting registers
     bc = 0x1245
     a = 100
+    a_ = 222
     fl_z = false
 
     [test.init]
@@ -25,10 +26,10 @@ labels_file = "examples/main.sld"
             fill = [0, 100, 2, 3, 4]
         [[test.init.memory]]
             start = 0x8000
-            fill = [1]
+            #fill = [1]
             size = 256
             offset = 0
-            #file = "initial_8000.bin"
+            file = "initial_8000.bin"
     [test.run]
         fname = "tiles_gen"
         call = 0x3345
@@ -37,6 +38,7 @@ labels_file = "examples/main.sld"
     [test.expect.registers]
         fl_z = true
         a = 0x00
+        a_ = 200
     [[test.expect.memory]]
         address = 0xff00 
         value = 0x22
@@ -50,7 +52,10 @@ labels_file = "examples/main.sld"
     [test.expect.timing]
         max_ticks = 400
         #exact_ticks = 198
-[[test]]
-    name = "Second"
+[[xtest]]
+    xname = "Second"
     de = 0x1245
     a = 0x44
+    [xtest.run]
+        fname = "tiles_gen"
+        call = 0x3345    
