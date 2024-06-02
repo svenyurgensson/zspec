@@ -166,6 +166,10 @@ void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTes
             CASE("hl_"): { check_16bit(value); test->expect_registers.reg_h_ = (value >> 8) & 0xff; test->expect_registers.reg_l_ = value & 0xff; break; }
             CASE("de_"): { check_16bit(value); test->expect_registers.reg_d_ = (value >> 8) & 0xff; test->expect_registers.reg_e_ = value & 0xff; break; }
             CASE("bc_"): { check_16bit(value); test->expect_registers.reg_b_ = (value >> 8) & 0xff; test->expect_registers.reg_c_ = value & 0xff; break; }
+
+            CASE("ix"): { test->expect_registers.reg_ix = check_16bit(value); break; }
+            CASE("iy"): { test->expect_registers.reg_iy = check_16bit(value); break; } 
+
             default: { fail(string_format("Error in test: '%s'. Unknown register: '%s' in expectations!", test->name.c_str(), current_reg.c_str())); }
         }
     });
@@ -264,6 +268,9 @@ void set_precondition_reg(std::string current_reg, int value, SingleTest * test)
         CASE("hl_"): { check_16bit(value); test->expect_registers.reg_h_ = (value >> 8) & 0xff; test->expect_registers.reg_l_ = value & 0xff; return; }
         CASE("de_"): { check_16bit(value); test->expect_registers.reg_d_ = (value >> 8) & 0xff; test->expect_registers.reg_e_ = value & 0xff; return; }
         CASE("bc_"): { check_16bit(value); test->expect_registers.reg_b_ = (value >> 8) & 0xff; test->expect_registers.reg_c_ = value & 0xff; return; }
+
+        CASE("ix"): { test->expect_registers.reg_ix = check_16bit(value); return; }
+        CASE("iy"): { test->expect_registers.reg_iy = check_16bit(value); return; }
     }
 }
 
@@ -287,6 +294,7 @@ void handle_tests(toml::node_view<toml::node> test_section) {
             test.is_skipped = true;
             test.name = skipped_name;
             std::cout << Colors::BLUE << test.name  << " (skipped)" << Colors::RESET << "\n";
+            test.result.code = SKIP;
             return;
         } else {
             std::cout << test.name  << "\n";

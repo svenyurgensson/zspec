@@ -49,7 +49,7 @@ struct TestExpectRegisters {
     int fl_z = -1, fl_p = -1, fl_c = -1;
     int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1; 
     int reg_b = -1, reg_b_ = -1, reg_c = -1, reg_c_ = -1, reg_d = -1, reg_d_ = -1,  reg_e = -1, reg_e_ = -1;
-    int reg_sp = -1;      
+    int reg_ix = -1, reg_iy = -1, reg_sp = -1;      
 };
 
 struct TestExpectTiming {
@@ -79,6 +79,8 @@ struct TestPreconditions {
     int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1; 
     int reg_b = -1, reg_b_ = -1, reg_c = -1, reg_c_ = -1, reg_d = -1, reg_d_ = -1,  reg_e = -1, reg_e_ = -1;
     int reg_sp = -1;   
+    int reg_ix = -1;
+    int reg_iy = -1;   
 
     std::vector<TestMemoryState> memory_states;
 };
@@ -114,6 +116,7 @@ struct ZTest {
 const std::string REGISTERS[] = { "a", "h", "l", "b", "c", "d", "e",
                                 "a_", "h_", "l_", "b_", "c_", "d_", "e_",
                                 "hl", "hl_", "bc", "bc_", "de", "de_", "sp",
+                                "ix", "iy",
                                 "fl_z", "fl_p", "fl_c" };
 
 // For keeping pristine memory image between tests

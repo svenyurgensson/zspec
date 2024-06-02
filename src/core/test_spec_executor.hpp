@@ -20,7 +20,5 @@ class MMU
         memset(&IO, 0, sizeof(IO));
     }
 
-    
-};
 
-static MMU* mmu_unit;
+};

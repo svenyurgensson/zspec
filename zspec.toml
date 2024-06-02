@@ -26,10 +26,8 @@ labels_file = "examples/main.sld"
             fill = [0, 100, 2, 3, 4]
         [[test.init.memory]]
             start = 0x8000
-            #fill = [1]
             size = 256
-            offset = 0
-            file = "initial_8000.bin"
+            file = "initial_8000.txt"
     [test.run]
         fname = "tiles_gen"
         call = 0x3345
