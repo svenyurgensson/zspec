@@ -3,11 +3,12 @@ cmake_minimum_required(VERSION 3.15)
 project(zspec VERSION 0.0.1 LANGUAGES CXX)
 
 #set(CMAKE_CXX_COMPILER "/usr/local/bin/g++-14")
-enable_testing()
+#enable_testing()
 
 set(EXE_NAME zspec)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS off)
+set(CMAKE_CXX_FLAGS "-g3 -O3")
 
 message (${CMAKE_CXX_COMPILER})
 
