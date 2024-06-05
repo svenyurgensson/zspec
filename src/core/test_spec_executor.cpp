@@ -262,8 +262,12 @@ void execute_test_spec(SingleTest* test, MemoryImage* m) {
     faults_count += print_check_timing_expectations(curr_tick);
 
     // save results
-
-    // print totals results
+    if (faults_count > 0) {
+        curr_test->result.code = FAIL;
+        zspec_suit.failed_count += 1;
+    } else {
+        curr_test->result.code = PASS;
+    }
 
     delete z80_cpu;
     delete mmu_unit;

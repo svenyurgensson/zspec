@@ -295,6 +295,7 @@ void handle_tests(toml::node_view<toml::node> test_section) {
             test.name = skipped_name;
             std::cout << Colors::BLUE << test.name  << " (skipped)" << Colors::RESET << "\n";
             test.result.code = SKIP;
+            zspec_suit.skipped_count += 1;
             return;
         } else {
             std::cout << test.name  << "\n";
@@ -419,7 +420,7 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
     }
 }
 
-void config_parser(const char* path) {
+void run_tests(const char* path) {
     toml::parse_result config;
 
     try {
@@ -433,4 +434,16 @@ void config_parser(const char* path) {
 
     toml::node_view<toml::node> test_sections = config["test"];
     handle_tests(test_sections); 
+
+    std::cout << "------------------------------------------------------------------------\n" << std::dec;
+    
+    int total_tests = zspec_suit.tests_list.size();
+    int skipped = zspec_suit.skipped_count;
+    int failed = zspec_suit.failed_count;
+    int passed = total_tests - (skipped + failed);
+
+    std::cout << "Total tests: " << total_tests << "  ";
+    std::cout << Colors::BLUE  << "Skipped tests: " << skipped << "  ";
+    std::cout << Colors::RED   << "Failed tests: "  << failed << "  ";
+    std::cout << Colors::GREEN << "Passed tests: "  << passed << "\n";
 }

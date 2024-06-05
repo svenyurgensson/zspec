@@ -111,6 +111,7 @@ struct ZTest {
     MemoryImage memory_image;
     std::vector<SingleTest> tests_list;
     int skipped_count = 0;
+    int failed_count = 0;
 };
 
 const std::string REGISTERS[] = { "a", "h", "l", "b", "c", "d", "e",

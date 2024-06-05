@@ -5,7 +5,7 @@
     labels_file = "examples/zx_screen_proc.sld"
 
 [[test]]
-    name = "Down HL. Calculate addr on screen, below current in HL"
+    name = "Down HL. Calculate screen addr in HL, below current"
 
     # test preconditions
     hl = 0x4000

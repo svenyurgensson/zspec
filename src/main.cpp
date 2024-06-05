@@ -9,6 +9,5 @@ int main(int argc, char** argv) {
         std::cout << Colors::RED << "File '" << path << "' not found!\n"  << Colors::RESET;
     }
 
-    config_parser(path);  
-    // TODO: tests_results_print()      
+    run_tests(path);  
 }
