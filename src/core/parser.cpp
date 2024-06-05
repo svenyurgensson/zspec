@@ -124,7 +124,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
             fail(string_format("Start address or function to run is not found for test: %s", test->name.c_str()));
         }
     }
-    std::cout << "calling address: 0x" << test->test_run.call << std::dec << " " << constant_function_name << "\n";
+    std::cout << "    run @ 0x" << test->test_run.call << std::dec << " " << constant_function_name << "\n";
 }
 
 void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTest * test) {
@@ -239,38 +239,38 @@ void build_test_expect_timing(toml::node_view<toml::node> section, SingleTest * 
     }
 }
 
-void set_precondition_reg(std::string current_reg, int value, SingleTest * test) {
-    std::cout << "set reg: " << current_reg << " = 0x" << std::hex << value << "\n";
+void set_precondition_reg(std::string current_reg, int value, SingleTest* test) {
+    std::cout << "    " << current_reg << " = 0x" << std::hex << value << "\n";
     SWITCH(current_reg) {
-        CASE("a"):  { test->expect_registers.reg_a  = check_8bit(value); return; }
-        CASE("h"):  { test->expect_registers.reg_h  = check_8bit(value); return; }
-        CASE("l"):  { test->expect_registers.reg_l  = check_8bit(value); return; }
-        CASE("b"):  { test->expect_registers.reg_b  = check_8bit(value); return; }
-        CASE("c"):  { test->expect_registers.reg_c  = check_8bit(value); return; }
-        CASE("d"):  { test->expect_registers.reg_d  = check_8bit(value); return; }
-        CASE("e"):  { test->expect_registers.reg_e  = check_8bit(value); return; }        
-        CASE("a_"): { test->expect_registers.reg_a_ = check_8bit(value); return; }
-        CASE("h_"): { test->expect_registers.reg_h_ = check_8bit(value); return; }
-        CASE("l_"): { test->expect_registers.reg_l_ = check_8bit(value); return; }
-        CASE("b_"): { test->expect_registers.reg_b_ = check_8bit(value); return; }
-        CASE("c_"): { test->expect_registers.reg_c_ = check_8bit(value); return; }
-        CASE("d_"): { test->expect_registers.reg_d_ = check_8bit(value); return; }
-        CASE("e_"): { test->expect_registers.reg_e_ = check_8bit(value); return; }        
+        CASE("a"):  { test->preconditions.reg_a  = check_8bit(value); return; }
+        CASE("h"):  { test->preconditions.reg_h  = check_8bit(value); return; }
+        CASE("l"):  { test->preconditions.reg_l  = check_8bit(value); return; }
+        CASE("b"):  { test->preconditions.reg_b  = check_8bit(value); return; }
+        CASE("c"):  { test->preconditions.reg_c  = check_8bit(value); return; }
+        CASE("d"):  { test->preconditions.reg_d  = check_8bit(value); return; }
+        CASE("e"):  { test->preconditions.reg_e  = check_8bit(value); return; }        
+        CASE("a_"): { test->preconditions.reg_a_ = check_8bit(value); return; }
+        CASE("h_"): { test->preconditions.reg_h_ = check_8bit(value); return; }
+        CASE("l_"): { test->preconditions.reg_l_ = check_8bit(value); return; }
+        CASE("b_"): { test->preconditions.reg_b_ = check_8bit(value); return; }
+        CASE("c_"): { test->preconditions.reg_c_ = check_8bit(value); return; }
+        CASE("d_"): { test->preconditions.reg_d_ = check_8bit(value); return; }
+        CASE("e_"): { test->preconditions.reg_e_ = check_8bit(value); return; }        
 
-        CASE("fl_z"): { test->expect_registers.fl_z = check_bit(value); return; }
-        CASE("fl_p"): { test->expect_registers.fl_p = check_bit(value); return; }
-        CASE("fl_c"): { test->expect_registers.fl_c = check_bit(value); return; }
+        CASE("fl_z"): { test->preconditions.fl_z = check_bit(value); return; }
+        CASE("fl_p"): { test->preconditions.fl_p = check_bit(value); return; }
+        CASE("fl_c"): { test->preconditions.fl_c = check_bit(value); return; }
 
-        CASE("sp"):  { test->expect_registers.reg_sp = check_16bit(value); return; }
-        CASE("hl"):  { check_16bit(value); test->expect_registers.reg_h  = (value >> 8) & 0xff; test->expect_registers.reg_l = value & 0xff; return; }
-        CASE("de"):  { check_16bit(value); test->expect_registers.reg_d  = (value >> 8) & 0xff; test->expect_registers.reg_e = value & 0xff; return; }
-        CASE("bc"):  { check_16bit(value); test->expect_registers.reg_b  = (value >> 8) & 0xff; test->expect_registers.reg_c = value & 0xff; return; }
-        CASE("hl_"): { check_16bit(value); test->expect_registers.reg_h_ = (value >> 8) & 0xff; test->expect_registers.reg_l_ = value & 0xff; return; }
-        CASE("de_"): { check_16bit(value); test->expect_registers.reg_d_ = (value >> 8) & 0xff; test->expect_registers.reg_e_ = value & 0xff; return; }
-        CASE("bc_"): { check_16bit(value); test->expect_registers.reg_b_ = (value >> 8) & 0xff; test->expect_registers.reg_c_ = value & 0xff; return; }
+        CASE("sp"):  { test->preconditions.reg_sp = check_16bit(value); return; }
+        CASE("hl"):  { check_16bit(value); test->preconditions.reg_h  = (value >> 8) & 0xff; test->preconditions.reg_l = value & 0xff; return; }
+        CASE("de"):  { check_16bit(value); test->preconditions.reg_d  = (value >> 8) & 0xff; test->preconditions.reg_e = value & 0xff; return; }
+        CASE("bc"):  { check_16bit(value); test->preconditions.reg_b  = (value >> 8) & 0xff; test->preconditions.reg_c = value & 0xff; return; }
+        CASE("hl_"): { check_16bit(value); test->preconditions.reg_h_ = (value >> 8) & 0xff; test->preconditions.reg_l_ = value & 0xff; return; }
+        CASE("de_"): { check_16bit(value); test->preconditions.reg_d_ = (value >> 8) & 0xff; test->preconditions.reg_e_ = value & 0xff; return; }
+        CASE("bc_"): { check_16bit(value); test->preconditions.reg_b_ = (value >> 8) & 0xff; test->preconditions.reg_c_ = value & 0xff; return; }
 
-        CASE("ix"): { test->expect_registers.reg_ix = check_16bit(value); return; }
-        CASE("iy"): { test->expect_registers.reg_iy = check_16bit(value); return; }
+        CASE("ix"): { test->preconditions.reg_ix = check_16bit(value); return; }
+        CASE("iy"): { test->preconditions.reg_iy = check_16bit(value); return; }
     }
 }
 
@@ -318,8 +318,6 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         auto init_section = section.at_path("init");        
         if (init_section.is_table() && !init_section.as_table()->empty()) {
             build_test_init(init_section, &test);
-        } else {
-            std::cout << "No init section for test: '" << test.name << "'\n";
         }
         
         auto run_section = section.at_path("run");
@@ -341,7 +339,7 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         
         zspec_suit.tests_list.push_back(test);
 
-        execute_test_spec(&test);
+        execute_test_spec(&test, &original_memory_image);
 
         test_idx++; 
         std::cout << "\n";
@@ -376,24 +374,26 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
         fail(string_format("File 'bin_file' %s is too big (%d). Maximum is: %d", memory_image_file.c_str(), size, diff));
     }
     ifd.seekg(0, std::ios::beg);
-    ifd.read(&original_memory_image.mem[0], size);
+    ifd.read(&original_memory_image.mem[original_memory_image.load_addr], size);
     ifd.close();
 
     // defining consts
     auto defined_constants = init_section["const"];
-    defined_constants.as_table()->for_each([](auto& key, toml::value<int64_t>& value) {
-        if constexpr (toml::is_integer<decltype(value)>) {
-            if (value > MAX_LOAD_ADDRESS || value < 0) {
-                std::cerr << Colors::RED << "Defined constant: '" << key << "' = "sv << value << " exeeds maximum memory ("sv << MAX_LOAD_ADDRESS << ") address!" << std::endl;
+    if (defined_constants.is_table()) {
+        defined_constants.as_table()->for_each([](auto& key, toml::value<int64_t>& value) {
+            if constexpr (toml::is_integer<decltype(value)>) {
+                if (value > MAX_LOAD_ADDRESS || value < 0) {
+                    std::cerr << Colors::RED << "Defined constant: '" << key << "' = "sv << value << " exeeds maximum memory ("sv << MAX_LOAD_ADDRESS << ") address!" << std::endl;
+                    exit(1);
+                }
+                PredefinedConstant pconst = { (std::string)key, (int64_t)value };
+                original_memory_image.constants.push_back(pconst);
+            } else {
+                std::cerr << Colors::RED << "Constants can be only integers! Found: " << key << " = "sv << value << std::endl;
                 exit(1);
-            }
-            PredefinedConstant pconst = { (std::string)key, (int64_t)value };
-            original_memory_image.constants.push_back(pconst);
-        } else {
-            std::cerr << Colors::RED << "Constants can be only integers! Found: " << key << " = "sv << value << std::endl;
-            exit(1);
-        }        
-    });
+            }        
+        });
+    }
 
     // load labels
     auto lf = init_section["labels_file"].value<std::string>();
@@ -432,5 +432,5 @@ void config_parser(const char* path) {
     handle_init_section(init_section);
 
     toml::node_view<toml::node> test_sections = config["test"];
-    handle_tests(test_sections);
+    handle_tests(test_sections); 
 }

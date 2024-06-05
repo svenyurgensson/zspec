@@ -115,6 +115,13 @@ class Z80
         CB.write(CB.arg, addr, value);
         consumeClock(clock);
     }
+    // flag checker
+    inline bool isFlagS() { return reg.pair.F & flagS(); }
+    inline bool isFlagZ() { return reg.pair.F & flagZ(); }
+    inline bool isFlagH() { return reg.pair.F & flagH(); }
+    inline bool isFlagPV() { return reg.pair.F & flagPV(); }
+    inline bool isFlagN() { return reg.pair.F & flagN(); }
+    inline bool isFlagC() { return reg.pair.F & flagC(); }
 
   private: // Internal functions & variables
     // bit table
@@ -150,14 +157,6 @@ class Z80
         setFlagX(value & flagX());
         setFlagY(value & flagY());
     }
-
-    // flag checker
-    inline bool isFlagS() { return reg.pair.F & flagS(); }
-    inline bool isFlagZ() { return reg.pair.F & flagZ(); }
-    inline bool isFlagH() { return reg.pair.F & flagH(); }
-    inline bool isFlagPV() { return reg.pair.F & flagPV(); }
-    inline bool isFlagN() { return reg.pair.F & flagN(); }
-    inline bool isFlagC() { return reg.pair.F & flagC(); }
 
     enum class Condition {
         Z = 0x40,

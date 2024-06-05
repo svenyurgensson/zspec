@@ -1,0 +1,22 @@
+[init]
+
+    bin_file = "examples/zs_screen_proc.bin"
+    load_addr = 0xC000
+    labels_file = "examples/zx_screen_proc.sld"
+
+[[test]]
+    name = "Down HL. Calculate addr on screen, below current in HL"
+
+    # test preconditions
+    hl = 0x4000
+    fl_c = false
+
+    [test.run]
+        fname = "down_hl"
+        max_ticks = 200
+
+    [test.expect.registers]
+        fl_c = false
+        hl = 0x4100
+    [test.expect.timing]
+        max_ticks = 100

@@ -6,7 +6,7 @@
 #include "../../libs/utils.hpp"
 #include "test_suits_config.hpp"
 
-void execute_test_spec(SingleTest* test);
+void execute_test_spec(SingleTest* test, MemoryImage * mem_img);
 
 class MMU
 {
@@ -19,6 +19,6 @@ class MMU
         memset(&RAM, 0, sizeof(RAM));
         memset(&IO, 0, sizeof(IO));
     }
-
-
 };
+
+constexpr int MAX_TICKS_PER_TEST = 100000;
