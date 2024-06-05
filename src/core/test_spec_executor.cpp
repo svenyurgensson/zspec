@@ -241,11 +241,13 @@ void execute_test_spec(SingleTest* test, MemoryImage* m) {
     if (test->test_run.max_ticks != -1) max_ticks = test->test_run.max_ticks; 
 
     // run CPU ticks loop 
+    int total_ticks = 0;
+
     while (!is_finished) {
         if (curr_tick >= max_ticks) { is_finished = true; break; }
         curr_tick += 1;
 
-        z80_cpu->execute(1);
+        total_ticks += z80_cpu->execute(1);
     }
     
     int faults_count = 0;
@@ -259,7 +261,7 @@ void execute_test_spec(SingleTest* test, MemoryImage* m) {
     faults_count += print_check_ports_expectations();
 
     // check  ticks expectations
-    faults_count += print_check_timing_expectations(curr_tick);
+    faults_count += print_check_timing_expectations(total_ticks);
 
     // save results
     if (faults_count > 0) {
