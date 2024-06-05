@@ -4,7 +4,6 @@ SingleTest* curr_test; // shared b/w functs
 MemoryImage* mem_img;
 MMU* mmu_unit;
 Z80* z80_cpu;
-int curr_tick; 
 bool is_finished;
 uint16_t top_sp;
 
@@ -120,6 +119,23 @@ int compare_print(std::string entity_name, int expected, uint8_t actual) {
     }
 }
 
+int compare_print_flag(std::string entity_name, int expected, uint8_t actual) {
+    if (expected == -1) return 0;
+    uint8_t expected_ch = (uint8_t)expected;
+
+    std::string exp = "false", act = "true";
+    if (expected) exp = "true";
+    if (actual) act = "true";
+
+    if (expected_ch == actual) {
+        std::cout << Colors::GREEN << "    expect " << entity_name << " == " << exp << ", actual: " << act << Colors::RESET << "\n";
+        return 0;
+    } else {
+        std::cout << Colors::RED << "    expect " << entity_name << " == " << exp << ", but actual: " << act << Colors::RESET << "\n";
+        return 1;
+    }
+}
+
 int print_check_regs_expectations() {
     TestExpectRegisters * t = &curr_test->expect_registers;
     int total_failed = 0;
@@ -143,9 +159,9 @@ int print_check_regs_expectations() {
     total_failed += compare_print("IX", t->reg_ix, z80_cpu->reg.IX);
     total_failed += compare_print("IY", t->reg_iy, z80_cpu->reg.IY);
 
-    total_failed += compare_print("flag Z", t->fl_z, z80_cpu->isFlagZ());
-    total_failed += compare_print("flag C", t->fl_c, z80_cpu->isFlagC());
-    total_failed += compare_print("flag PV", t->fl_p, z80_cpu->isFlagPV());
+    total_failed += compare_print_flag("flag Z", t->fl_z, z80_cpu->isFlagZ());
+    total_failed += compare_print_flag("flag C", t->fl_c, z80_cpu->isFlagC());
+    total_failed += compare_print_flag("flag PV", t->fl_p, z80_cpu->isFlagPV());
 
     return total_failed;
 }
@@ -236,7 +252,6 @@ void execute_test_spec(SingleTest* test, MemoryImage* m) {
         is_finished = true;
     });
 
-    curr_tick = 0;
     int max_ticks = MAX_TICKS_PER_TEST;
     if (test->test_run.max_ticks != -1) max_ticks = test->test_run.max_ticks; 
 
@@ -244,8 +259,7 @@ void execute_test_spec(SingleTest* test, MemoryImage* m) {
     int total_ticks = 0;
 
     while (!is_finished) {
-        if (curr_tick >= max_ticks) { is_finished = true; break; }
-        curr_tick += 1;
+        if (total_ticks >= max_ticks) { is_finished = true; break; }
 
         total_ticks += z80_cpu->execute(1);
     }

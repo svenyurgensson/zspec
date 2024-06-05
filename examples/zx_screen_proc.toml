@@ -5,11 +5,10 @@
     labels_file = "examples/zx_screen_proc.sld"
 
 [[test]]
-    name = "Down HL. Calculate screen addr in HL, below current"
+    name = "Down HL. Calculate screen addr in HL, below current line"
 
     # test preconditions
     hl = 0x4000
-    fl_c = false
 
     [test.run]
         fname = "down_hl"
@@ -18,5 +17,21 @@
     [test.expect.registers]
         fl_c = false
         hl = 0x4100
+    [test.expect.timing]
+        max_ticks = 100
+
+[[test]]
+    name = "Down HL. Calculate screen addr in HL, below current line when on line 191"
+
+    # test preconditions
+    hl = 0x57e1
+
+    [test.run]
+        fname = "down_hl"
+        max_ticks = 200
+
+    [test.expect.registers]
+        fl_c = true
+        hl = 0x5801
     [test.expect.timing]
         max_ticks = 100

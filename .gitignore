@@ -1,3 +1,6 @@
 .vscode
 build
 CMakeFiles
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
