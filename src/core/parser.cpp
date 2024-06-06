@@ -107,7 +107,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
         if (iter == original_memory_image.constants.end())
              fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str())); 
         int index = std::distance(original_memory_image.constants.begin(), iter);                   
-        constant_function_name = "(function: '" + fname + "')";
+        constant_function_name = "[ " + fname + " ]";
         test->test_run.call = original_memory_image.constants[index].value;
 
     } else {
