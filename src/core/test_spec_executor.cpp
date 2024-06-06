@@ -221,10 +221,11 @@ int print_check_timing_expectations(int curr_tick) {
             return 1;
         }
     }
+    std::cout << Colors::GREEN << "    CPU ticks: " << curr_tick << Colors::RESET << "\n";
     return 0;
 }
 
-void execute_test_spec(SingleTest* test, MemoryImage* m) {  
+void execute_test_spec(SingleTest* test, MemoryImage* m, ZTest* suit) {  
     if (test->is_skipped) {
         std::cout << Colors::BLUE << "Skip test: " << test->name << Colors::RESET << "\n\n";
         return;
@@ -280,7 +281,7 @@ void execute_test_spec(SingleTest* test, MemoryImage* m) {
     // save results
     if (faults_count > 0) {
         curr_test->result.code = FAIL;
-        zspec_suit.failed_count += 1;
+        suit->failed_count += 1;
     } else {
         curr_test->result.code = PASS;
     }

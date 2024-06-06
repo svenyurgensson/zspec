@@ -6,7 +6,7 @@
 #include "../../libs/utils.hpp"
 #include "test_suits_config.hpp"
 
-void execute_test_spec(SingleTest* test, MemoryImage * mem_img);
+void execute_test_spec(SingleTest* test, MemoryImage * mem_img, ZTest* suit);
 
 class MMU
 {

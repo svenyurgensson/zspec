@@ -340,7 +340,7 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         
         zspec_suit.tests_list.push_back(test);
 
-        execute_test_spec(&test, &original_memory_image);
+        execute_test_spec(&test, &original_memory_image, &zspec_suit);
 
         test_idx++; 
         std::cout << "\n";

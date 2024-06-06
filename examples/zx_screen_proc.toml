@@ -35,3 +35,44 @@
         hl = 0x5801
     [test.expect.timing]
         max_ticks = 100
+
+
+[[test]]
+    name = "Calculate screen addr with given char coordinates (0,0)"
+    d = 0
+    e = 0
+    [test.run]
+        fname = "xy2char"
+    [test.expect.registers]
+        de = 0x4000
+    [test.expect.timing]
+        max_ticks = 100   
+
+[[test]]
+    name = "Calculate screen addr with given char coordinates (23,31)"
+    d = 23
+    e = 31
+    [test.run]
+        fname = "xy2char"
+    [test.expect.registers]
+        de = 0x50ff
+
+
+[[test]]
+    name = "Calculate screen addr with given X,Y coordinates (0,0)"
+    h = 0
+    l = 0
+    [test.run]
+        fname = "xy2screen"
+    [test.expect.registers]
+        de = 0x4000      
+
+[[test]]
+    name = "Calculate screen addr with given X,Y coordinates (191,255)"
+    h = 191
+    l = 255
+    [test.run]
+        fname = "xy2screen"
+    [test.expect.registers]
+        de = 0x57FF              
+
