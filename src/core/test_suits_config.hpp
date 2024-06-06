@@ -8,7 +8,7 @@ struct PredefinedConstant {
 struct MemoryImage {
     int load_addr = 0;
     std::string bin_file;
-    int size = 65536;
+    int size = 0xFFFF;
     char mem[0x10000];
 
     std::vector<PredefinedConstant> constants;
@@ -30,7 +30,7 @@ struct FileInitMemory {
     int size = -1;
     int offset = -1;
     std::string filename;
-    char content[65535];
+    char content[0x10000];
 };
 
 struct TestInit {
