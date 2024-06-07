@@ -8,6 +8,36 @@
 #include "toml.hpp"
 
 
+static std::string ssprintf0x00x(uint8_t p) {
+   std::stringstream ss;
+
+   ss << "0x"
+      << std::hex << std::internal << std::setw(2) 
+      << std::setfill('0')
+      << (uint64_t)p << std::dec;
+
+   return (ss.str());
+}
+
+static std::string ssprintf0x0000x(uint16_t p) {
+   std::stringstream ss;
+
+   ss << "0x"
+      << std::hex << std::internal << std::setw(4) 
+      << std::setfill('0')
+      << (uint64_t)p  << std::dec;
+
+   return (ss.str());
+}
+
+static inline std::string ssprintf_bool(uint8_t p) {
+    if (p) {
+        return "true";
+    } else {
+        return "false";
+    }
+}
+
 static std::vector<std::string> split_string(std::string str, char splitter) {
     std::vector<std::string> result;
     std::string current = ""; 
@@ -91,13 +121,13 @@ static std::basic_string<T> string_format(T const* const format, Args ... args)
 // string_format("string. number %d.", 10)
 // TODO: add context!
 static inline int check_8bit(int i) {
-    if (i > 255 || i < 0) fail(string_format("%d is wrong 8-bit value!", i));
+    if (i > 255 || i < 0) fail(string_format("\n%d is wrong 8-bit value!", i));
     return i;
 }
 
 // TODO: add context!
 static inline int check_16bit(int i) {
-    if (i > 65535 || i < 0) fail(string_format("%d is wrong 16-bit value!", i));
+    if (i > 65535 || i < 0) fail(string_format("\n%d is wrong 16-bit value!", i));
     return i;
 }
 
@@ -106,7 +136,7 @@ static inline int check_bit(int i) {
     switch (i) {
         case 1: return 1;
         case 0: return 0;
-        default: fail(string_format("%d is wrong boolean value!", i));
+        default: fail(string_format("\n%d is wrong boolean value!", i));
     }
     return 0;
 }

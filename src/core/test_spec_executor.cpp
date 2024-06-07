@@ -102,19 +102,15 @@ void assign_sp() {
     });
 }
 
-void put8hex(uint8_t h) {
-    std::cout << "0x" << static_cast<unsigned>(h);
-}
-
 int compare_print(std::string entity_name, int expected, uint8_t actual) {
     if (expected == -1) return 0;
     uint8_t expected_ch = (uint8_t)expected;
 
     if (expected_ch == actual) {
-        std::cout << std::hex << Colors::GREEN << "    expect " << entity_name << " == 0x" << (int)expected << ", actual: 0x" << (int)actual << Colors::RESET << std::dec << "\n";
+        std::cout << Colors::GREEN << "    expect " << entity_name << " == " << ssprintf0x00x(expected) << ", actual: " << ssprintf0x00x(actual) << Colors::RESET << "\n";
         return 0;
     } else {
-        std::cout << std::hex << Colors::RED << "    expect " << entity_name << " == 0x" << (int)expected << ", but actual: 0x" << (int)actual << Colors::RESET << std::dec << "\n";
+        std::cout << Colors::RED << "    expect " << entity_name << " == " << ssprintf0x00x(expected) << ", but actual: " << ssprintf0x00x(actual) << Colors::RESET << "\n";
         return 1;
     }
 }
@@ -175,17 +171,17 @@ int print_check_mem_expectations() {
 
         if (exp.value != -1) {
             if (mem_value == exp.value) {
-                std::cout << Colors::GREEN << "    RAM @ addr " << addr << " must be: " << exp.value << ", actual: " << exp.value << Colors::RESET << "\n";
+                std::cout << Colors::GREEN << "    RAM @ addr " << ssprintf0x0000x(addr) << " must be: " << ssprintf0x00x(exp.value) << ", actual: " << ssprintf0x00x(mem_value) << Colors::RESET << "\n";
             } else {
-                std::cout << Colors::RED << "    RAM @ addr " << addr << " must be: " << exp.value << ", but actual: " << mem_value << Colors::RESET << "\n";
+                std::cout << Colors::RED << "    RAM @ addr " << ssprintf0x0000x(addr) << " must be: " << ssprintf0x00x(exp.value) << ", but actual: " << ssprintf0x00x(mem_value) << Colors::RESET << "\n";
                 faults += 1;
             }
         } 
         if (exp.value_not != -1) {
             if (mem_value != exp.value_not) {
-                std::cout << Colors::GREEN << "    RAM @ addr " << addr << " must not be equal: " << exp.value << ", actual: " << mem_value << Colors::RESET << "\n";
+                std::cout << Colors::GREEN << "    RAM @ addr " << ssprintf0x0000x(addr) << " must not be equal: " << ssprintf0x00x(exp.value) << ", actual: " << ssprintf0x00x(mem_value) << Colors::RESET << "\n";
             } else {
-                std::cout << Colors::RED << "    RAM @ addr " << addr << " must not be equal: " << exp.value << ", but actual: " << mem_value << Colors::RESET << "\n";
+                std::cout << Colors::RED << "    RAM @ addr " << ssprintf0x0000x(addr) << " must not be equal: " << ssprintf0x00x(exp.value) << ", but actual: " << ssprintf0x00x(mem_value) << Colors::RESET << "\n";
                 faults += 1;
             }
         }

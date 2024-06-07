@@ -107,7 +107,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
         if (iter == original_memory_image.constants.end())
              fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str())); 
         int index = std::distance(original_memory_image.constants.begin(), iter);                   
-        constant_function_name = "[ " + fname + " ]";
+        constant_function_name = fname;
         test->test_run.call = original_memory_image.constants[index].value;
 
     } else {
@@ -124,7 +124,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
             fail(string_format("Start address or function to run is not found for test: %s", test->name.c_str()));
         }
     }
-    std::cout << "    run @ 0x" << test->test_run.call << std::dec << " " << constant_function_name << "\n";
+    std::cout << "    run " << constant_function_name << Colors::CYAN << "@" << Colors::RESET << ssprintf0x0000x(test->test_run.call) << "\n";
 }
 
 void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTest * test) {
@@ -240,37 +240,37 @@ void build_test_expect_timing(toml::node_view<toml::node> section, SingleTest * 
 }
 
 void set_precondition_reg(std::string current_reg, int value, SingleTest* test) {
-    std::cout << "    " << current_reg << " = 0x" << std::hex << value << "\n";
+    std::cout << "    " << string_toupper(current_reg) << " = ";
     SWITCH(current_reg) {
-        CASE("a"):  { test->preconditions.reg_a  = check_8bit(value); return; }
-        CASE("h"):  { test->preconditions.reg_h  = check_8bit(value); return; }
-        CASE("l"):  { test->preconditions.reg_l  = check_8bit(value); return; }
-        CASE("b"):  { test->preconditions.reg_b  = check_8bit(value); return; }
-        CASE("c"):  { test->preconditions.reg_c  = check_8bit(value); return; }
-        CASE("d"):  { test->preconditions.reg_d  = check_8bit(value); return; }
-        CASE("e"):  { test->preconditions.reg_e  = check_8bit(value); return; }        
-        CASE("a_"): { test->preconditions.reg_a_ = check_8bit(value); return; }
-        CASE("h_"): { test->preconditions.reg_h_ = check_8bit(value); return; }
-        CASE("l_"): { test->preconditions.reg_l_ = check_8bit(value); return; }
-        CASE("b_"): { test->preconditions.reg_b_ = check_8bit(value); return; }
-        CASE("c_"): { test->preconditions.reg_c_ = check_8bit(value); return; }
-        CASE("d_"): { test->preconditions.reg_d_ = check_8bit(value); return; }
-        CASE("e_"): { test->preconditions.reg_e_ = check_8bit(value); return; }        
+        CASE("a"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_a  = check_8bit(value); return; }
+        CASE("h"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_h  = check_8bit(value); return; }
+        CASE("l"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_l  = check_8bit(value); return; }
+        CASE("b"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_b  = check_8bit(value); return; }
+        CASE("c"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_c  = check_8bit(value); return; }
+        CASE("d"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_d  = check_8bit(value); return; }
+        CASE("e"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_e  = check_8bit(value); return; }        
+        CASE("a_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_a_ = check_8bit(value); return; }
+        CASE("h_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_h_ = check_8bit(value); return; }
+        CASE("l_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_l_ = check_8bit(value); return; }
+        CASE("b_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_b_ = check_8bit(value); return; }
+        CASE("c_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_c_ = check_8bit(value); return; }
+        CASE("d_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_d_ = check_8bit(value); return; }
+        CASE("e_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_e_ = check_8bit(value); return; }        
 
-        CASE("fl_z"): { test->preconditions.fl_z = check_bit(value); return; }
-        CASE("fl_p"): { test->preconditions.fl_p = check_bit(value); return; }
-        CASE("fl_c"): { test->preconditions.fl_c = check_bit(value); return; }
+        CASE("fl_z"): { std::cout << ssprintf_bool(value); test->preconditions.fl_z = check_bit(value); return; }
+        CASE("fl_p"): { std::cout << ssprintf_bool(value); test->preconditions.fl_p = check_bit(value); return; }
+        CASE("fl_c"): { std::cout << ssprintf_bool(value); test->preconditions.fl_c = check_bit(value); return; }
 
-        CASE("sp"):  { test->preconditions.reg_sp = check_16bit(value); return; }
-        CASE("hl"):  { check_16bit(value); test->preconditions.reg_h  = (value >> 8) & 0xff; test->preconditions.reg_l = value & 0xff; return; }
-        CASE("de"):  { check_16bit(value); test->preconditions.reg_d  = (value >> 8) & 0xff; test->preconditions.reg_e = value & 0xff; return; }
-        CASE("bc"):  { check_16bit(value); test->preconditions.reg_b  = (value >> 8) & 0xff; test->preconditions.reg_c = value & 0xff; return; }
-        CASE("hl_"): { check_16bit(value); test->preconditions.reg_h_ = (value >> 8) & 0xff; test->preconditions.reg_l_ = value & 0xff; return; }
-        CASE("de_"): { check_16bit(value); test->preconditions.reg_d_ = (value >> 8) & 0xff; test->preconditions.reg_e_ = value & 0xff; return; }
-        CASE("bc_"): { check_16bit(value); test->preconditions.reg_b_ = (value >> 8) & 0xff; test->preconditions.reg_c_ = value & 0xff; return; }
+        CASE("sp"):  { std::cout << ssprintf0x0000x(value); test->preconditions.reg_sp = check_16bit(value); return; }
+        CASE("hl"):  { std::cout << ssprintf0x0000x(value); check_16bit(value); test->preconditions.reg_h  = (value >> 8) & 0xff; test->preconditions.reg_l = value & 0xff; return; }
+        CASE("de"):  { std::cout << ssprintf0x0000x(value); check_16bit(value); test->preconditions.reg_d  = (value >> 8) & 0xff; test->preconditions.reg_e = value & 0xff; return; }
+        CASE("bc"):  { std::cout << ssprintf0x0000x(value); check_16bit(value); test->preconditions.reg_b  = (value >> 8) & 0xff; test->preconditions.reg_c = value & 0xff; return; }
+        CASE("hl_"): { std::cout << ssprintf0x0000x(value); check_16bit(value); test->preconditions.reg_h_ = (value >> 8) & 0xff; test->preconditions.reg_l_ = value & 0xff; return; }
+        CASE("de_"): { std::cout << ssprintf0x0000x(value); check_16bit(value); test->preconditions.reg_d_ = (value >> 8) & 0xff; test->preconditions.reg_e_ = value & 0xff; return; }
+        CASE("bc_"): { std::cout << ssprintf0x0000x(value); check_16bit(value); test->preconditions.reg_b_ = (value >> 8) & 0xff; test->preconditions.reg_c_ = value & 0xff; return; }
 
-        CASE("ix"): { test->preconditions.reg_ix = check_16bit(value); return; }
-        CASE("iy"): { test->preconditions.reg_iy = check_16bit(value); return; }
+        CASE("ix"): { std::cout << ssprintf0x0000x(value); test->preconditions.reg_ix = check_16bit(value); return; }
+        CASE("iy"): { std::cout << ssprintf0x0000x(value); test->preconditions.reg_iy = check_16bit(value); return; }
     }
 }
 
@@ -308,10 +308,12 @@ void handle_tests(toml::node_view<toml::node> test_section) {
 
             if (reg.has_value()) { 
                 set_precondition_reg(current_reg, *reg, &test); 
+                std::cout << "\n";
             } else {
                 reg = section.at_path(string_toupper(current_reg)).template value<int>();
                 if (reg.has_value()) { 
                     set_precondition_reg(current_reg, *reg, &test);
+                    std::cout << "\n";
                 } 
             }
         };
