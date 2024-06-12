@@ -1,6 +1,8 @@
 .vscode
+zspec
 build
 CMakeFiles
 CPackConfig.cmake
 CPackSourceConfig.cmake
 CTestTestfile.cmake
+Win32

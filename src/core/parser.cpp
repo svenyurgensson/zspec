@@ -416,7 +416,7 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
         // parse labels
         std::filesystem::path file_path = labels_file;   
 
-        labels_parser(&ifd, file_path.extension());
+        labels_parser(&ifd, file_path.extension().generic_string());
         
         ifd.close();
     }

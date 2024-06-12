@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <cwchar>
 #include <cstdio>
+#include <iomanip>
 #include <type_traits>
 #include "toml.hpp"
 

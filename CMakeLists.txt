@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(zspec VERSION 0.0.1 LANGUAGES CXX)
+set(REV 1.0.1)
+
+add_definitions(-DBUILD_REVISION="${REV}")
+
+project(zspec VERSION ${REV} LANGUAGES CXX)
 
 #set(CMAKE_CXX_COMPILER "/usr/local/bin/g++-14")
 #enable_testing()

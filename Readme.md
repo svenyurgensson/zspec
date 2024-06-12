@@ -108,10 +108,12 @@ So I decided to make this one mainly with intention if someone wiser then me cam
 
 You need to have c++ compiler to build this project.
 
+Or, instead you could take compiled version from `releases` folder.
 
 ### Installation
 
-Just `make` in project folder to build executable.
+* `make` in project folder to build executable.
+* copy executable somwhere to your `PATH`
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -132,7 +134,7 @@ _For more examples, please refer to the [Examples](https://github.com/svenyurgen
 ## Roadmap
 
 - [ ] Add ability to load binary file for expectations
-- [ ] Add command line params
+- [x] Add command line params
 - [ ] More documentation and examples
 
 See the [open issues](https://github.com/svenyurgensson/zspec/issues) for a full list of proposed features (and known issues).
