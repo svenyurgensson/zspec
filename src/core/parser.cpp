@@ -17,15 +17,15 @@ void build_test_init(toml::node_view<toml::node> section, SingleTest * test) {
             test->initializer.test_clear.start = check_16bit(*clear_start);
             test->initializer.test_clear.end   = check_16bit(*clear_end);
             test->initializer.test_clear.fill  = check_8bit(*clear_fill);
-        } else warn("You provided 'clear_start' without 'clear_end', skipping clearing memory!\n"); 
+        } else warn("You provided 'clear_start' without 'clear_end', skipping clearing memory!\n");
     } else if (clear_end.has_value()) {
-        warn("You provided 'clear_end' without 'clear_start', skipping clearing memory!\n"); 
+        warn("You provided 'clear_end' without 'clear_start', skipping clearing memory!\n");
     }
-    
+
     // init memory
     auto memory_inits = section.at_path("memory");
     if (!memory_inits.is_array()) return;
-    
+
     memory_inits.as_array()->for_each([&test](auto& el) {
         if constexpr (toml::is_table<decltype(el)>) {
             const toml::table& cur_mem_init = *el.as_table();
@@ -34,23 +34,23 @@ void build_test_init(toml::node_view<toml::node> section, SingleTest * test) {
             check_16bit(*start);
 
             auto fill = el.at_path("fill");
-            if (fill.is_value() && !fill.is_array())            
-                fail(string_format("Error in test: '%s'. Directive 'fill' must be array of bytes!", test->name.c_str()));            
+            if (fill.is_value() && !fill.is_array())
+                fail(string_format("Error in test: '%s'. Directive 'fill' must be array of bytes!", test->name.c_str()));
 
             std::optional<std::string> file = el["file"].template value<std::string>();
 
-            if (fill.is_value() && file.has_value()) 
-                fail(string_format("Error in test: '%s'. Cannot use 'fill' and 'file' directives simultaneously!", test->name.c_str()));            
-        
+            if (fill.is_value() && file.has_value())
+                fail(string_format("Error in test: '%s'. Cannot use 'fill' and 'file' directives simultaneously!", test->name.c_str()));
+
             if (fill.is_array()) { // fill memory with array of bytes
                 auto fill_arr = fill.as_array();
                 std::cout << "fill at: " << *start << " with: " << fill << "\n";
                 InitMemory imem;
                 imem.start = *start;
-                auto iter = std::find_if(fill_arr->begin(), fill_arr->end(), [&imem] (const auto& v) { 
-                    return v.is_integer() && 
+                auto iter = std::find_if(fill_arr->begin(), fill_arr->end(), [&imem] (const auto& v) {
+                    return v.is_integer() &&
                             check_8bit(* v.template value<int>()) &&
-                            (([&imem](const auto& vv) { imem.fill.push_back(* vv.template value<int>()); return true; })(v)); 
+                            (([&imem](const auto& vv) { imem.fill.push_back(* vv.template value<int>()); return true; })(v));
                 });
                 test->initializer.memory_initializers.push_back(imem);
 
@@ -103,10 +103,10 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
     if (f_name.has_value()) {
         const std::string fname = *f_name;
         auto iter = std::find_if(original_memory_image.constants.begin(), original_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
-        
+
         if (iter == original_memory_image.constants.end())
-             fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str())); 
-        int index = std::distance(original_memory_image.constants.begin(), iter);                   
+             fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str()));
+        int index = std::distance(original_memory_image.constants.begin(), iter);
         constant_function_name = fname;
         test->test_run.call = original_memory_image.constants[index].value;
 
@@ -115,11 +115,11 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
 
         if (call.has_value()) {
             int call_addr = *call;
-            if (call_addr >= MAX_BIN_SIZE || call_addr < 0) 
-                fail(string_format("Start address %d is wrong for test: %s", call_addr, test->name.c_str()));  
+            if (call_addr >= MAX_BIN_SIZE || call_addr < 0)
+                fail(string_format("Start address %d is wrong for test: %s", call_addr, test->name.c_str()));
 
-            test->test_run.call = call_addr;     
-            
+            test->test_run.call = call_addr;
+
         } else {
             fail(string_format("Start address or function to run is not found for test: %s", test->name.c_str()));
         }
@@ -128,7 +128,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
 }
 
 void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTest * test) {
-    if (!exp_regs.is_table())        
+    if (!exp_regs.is_table())
         std::cout << "exp regs: " << exp_regs << "\n";
     exp_regs.as_table()->for_each([&test](auto& key, auto& val) {
         std::string current_reg = string_tolower((std::string)key.str());
@@ -146,14 +146,14 @@ void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTes
             CASE("b"):  { test->expect_registers.reg_b = check_8bit(value); break; }
             CASE("c"):  { test->expect_registers.reg_c = check_8bit(value); break; }
             CASE("d"):  { test->expect_registers.reg_d = check_8bit(value); break; }
-            CASE("e"):  { test->expect_registers.reg_e = check_8bit(value); break; }        
+            CASE("e"):  { test->expect_registers.reg_e = check_8bit(value); break; }
             CASE("a_"): { test->expect_registers.reg_a_ = check_8bit(value); break; }
             CASE("h_"): { test->expect_registers.reg_h_ = check_8bit(value); break; }
             CASE("l_"): { test->expect_registers.reg_l_ = check_8bit(value); break; }
             CASE("b_"): { test->expect_registers.reg_b_ = check_8bit(value); break; }
             CASE("c_"): { test->expect_registers.reg_c_ = check_8bit(value); break; }
             CASE("d_"): { test->expect_registers.reg_d_ = check_8bit(value); break; }
-            CASE("e_"): { test->expect_registers.reg_e_ = check_8bit(value); break; }        
+            CASE("e_"): { test->expect_registers.reg_e_ = check_8bit(value); break; }
 
             CASE("fl_z"): { test->expect_registers.fl_z = check_bit(value); break; }
             CASE("fl_p"): { test->expect_registers.fl_p = check_bit(value); break; }
@@ -168,7 +168,7 @@ void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTes
             CASE("bc_"): { check_16bit(value); test->expect_registers.reg_b_ = (value >> 8) & 0xff; test->expect_registers.reg_c_ = value & 0xff; break; }
 
             CASE("ix"): { test->expect_registers.reg_ix = check_16bit(value); break; }
-            CASE("iy"): { test->expect_registers.reg_iy = check_16bit(value); break; } 
+            CASE("iy"): { test->expect_registers.reg_iy = check_16bit(value); break; }
 
             default: { fail(string_format("Error in test: '%s'. Unknown register: '%s' in expectations!", test->name.c_str(), current_reg.c_str())); }
         }
@@ -180,38 +180,46 @@ void build_test_expect_memory(toml::node_view<toml::node> section, SingleTest * 
 
     section.as_array()->for_each([&test](auto& el) {
         auto address   = el.at_path("address");
+        auto is_word   = el.at_path("word").template value<bool>();
         auto value     = el.at_path("value").template value<int64_t>();
         auto value_not = el.at_path("value_not").template value<int64_t>();
         auto series    = el.at_path("series");
 
         if (!address.is_value())
-            fail(string_format("Error in test: '%s'. Memory expectation must have 'address' to check!", test->name.c_str())); 
+            fail(string_format("Error in test: '%s'. Memory expectation must have 'address' to check!", test->name.c_str()));
 
         int addr = -1;
         if (address.is_integer()) addr = address.as_integer()->operator const int64_t & ();
         if (address.is_string()) {
             std::string fname = address.as_string()->operator const std::string & ();
             auto iter = std::find_if(original_memory_image.constants.begin(), original_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
-        
+
             if (iter == original_memory_image.constants.end())
-                fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str())); 
-            int index = std::distance(original_memory_image.constants.begin(), iter);                   
+                fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str()));
+            int index = std::distance(original_memory_image.constants.begin(), iter);
             addr = original_memory_image.constants[index].value;
         }
-         
-        if (addr > MAX_LOAD_ADDRESS || addr < 0)
-            fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), addr, MAX_LOAD_ADDRESS));       
+
+        int max_load_addr =  MAX_LOAD_ADDRESS;
+        int max_int = 0xff;
+        if (* is_word) {
+            max_load_addr =  MAX_LOAD_ADDRESS - 1;
+            max_int = 0xffff;
+        }
+
+        if (addr > max_load_addr || addr < 0)
+            fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), addr, max_load_addr));
 
         if (series.is_array() && series.is_homogeneous(toml::node_type::integer)) {
             int idx = addr;
-            series.as_array()->for_each([&test, &idx](auto& el) {
+            series.as_array()->for_each([&test, &idx, &is_word, &max_load_addr, &max_int](auto& el) {
                 auto val = el.as_integer()->operator const int64_t & ();
-                if (val > 0xFF || val < 0)
-                    fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds 0xFF!", test->name.c_str(), val));                
-                if (idx > MAX_LOAD_ADDRESS)
-                    fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), idx, MAX_LOAD_ADDRESS));       
+                if (val > max_int || val < 0)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds %d!", test->name.c_str(), val, max_int));
+                if (idx > max_load_addr)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), idx, max_load_addr));
 
-                TestExpectMemory expm = TestExpectMemory{ .address = idx, .value = static_cast<int>(val) };
+                TestExpectMemory expm = TestExpectMemory{ .is_word = (* is_word), .address = idx, .value = static_cast<int>(val) };
                 test->memory_expectations.push_back(expm);
                 idx += 1;
             });
@@ -219,32 +227,32 @@ void build_test_expect_memory(toml::node_view<toml::node> section, SingleTest * 
         } else {
 
             if (value.has_value() && value_not.has_value())
-                fail(string_format("Error in test: '%s'. Memory expectation 'value' and 'value_not' cannot be defined simultaneously!", test->name.c_str()));     
+                fail(string_format("Error in test: '%s'. Memory expectation 'value' and 'value_not' cannot be defined simultaneously!", test->name.c_str()));
             if (!value.has_value() && !value_not.has_value())
-                fail(string_format("Error in test: '%s'. Memory expectation 'value' or 'value_not' have to be defined!", test->name.c_str()));                 
+                fail(string_format("Error in test: '%s'. Memory expectation 'value' or 'value_not' have to be defined!", test->name.c_str()));
 
             TestExpectMemory expm;
 
             if (value.has_value()) {
                 int val = * value;
-                if (val > 0xFF || val < 0)
-                    fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds 0xFF!", test->name.c_str(), val)); 
-                expm = TestExpectMemory{ .address = addr, .value = val };
+                if (val > max_int || val < 0)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds %d!", test->name.c_str(), val, max_int));
+                expm = TestExpectMemory{ .is_word = (* is_word), .address = addr, .value = val };
             }
             if (value_not.has_value()) {
                 int val = * value_not;
-                if (val > 0xFF || val < 0)
-                    fail(string_format("Error in test: '%s'. Memory expectation 'value_not'=%d exceeds 0xFF!", test->name.c_str(), val)); 
-                expm = TestExpectMemory{ .address = addr, .value_not = val };
+                if (val > max_int || val < 0)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'value_not'=%d exceeds %d!", test->name.c_str(), val, max_int));
+                expm = TestExpectMemory{ .is_word = (* is_word), .address = addr, .value_not = val };
             }
 
             test->memory_expectations.push_back(expm);
-        }        
+        }
     });
-} 
+}
 
 void build_test_expect_ports(toml::node_view<toml::node> section, SingleTest * test) {
-    
+
 
 } // TODO test.expect_port
 
@@ -254,16 +262,16 @@ void build_test_expect_timing(toml::node_view<toml::node> section, SingleTest * 
 
     if (max_ticks.has_value()) {
         if (exact_ticks.has_value())
-            fail(string_format("Error in test: '%s'. Cannot have set both 'max_ticks' and 'exact_ticks'!", test->name.c_str())); 
-        
+            fail(string_format("Error in test: '%s'. Cannot have set both 'max_ticks' and 'exact_ticks'!", test->name.c_str()));
+
         if (*max_ticks >= MAX_CPU_TICKS_PER_TEST || *max_ticks < 4)
-            fail(string_format("Error in test: '%s'. 'max_ticks' set to: %d, but maximum allowed is: %d and minimum is: 4!", test->name.c_str(), *max_ticks, MAX_CPU_TICKS_PER_TEST));         
+            fail(string_format("Error in test: '%s'. 'max_ticks' set to: %d, but maximum allowed is: %d and minimum is: 4!", test->name.c_str(), *max_ticks, MAX_CPU_TICKS_PER_TEST));
 
         test->expect_timing.max_tick = *max_ticks;
     } else if (exact_ticks.has_value()) {
 
         if (*exact_ticks >= MAX_CPU_TICKS_PER_TEST || *exact_ticks < 4)
-            fail(string_format("Error in test: '%s'. 'exact_ticks' set to: %d, but maximum allowed is: %d and minimum is: 4!", test->name.c_str(), *exact_ticks, MAX_CPU_TICKS_PER_TEST)); 
+            fail(string_format("Error in test: '%s'. 'exact_ticks' set to: %d, but maximum allowed is: %d and minimum is: 4!", test->name.c_str(), *exact_ticks, MAX_CPU_TICKS_PER_TEST));
 
         test->expect_timing.exact_tick = *exact_ticks;
     }
@@ -278,14 +286,14 @@ void set_precondition_reg(std::string current_reg, int value, SingleTest* test) 
         CASE("b"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_b  = check_8bit(value); return; }
         CASE("c"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_c  = check_8bit(value); return; }
         CASE("d"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_d  = check_8bit(value); return; }
-        CASE("e"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_e  = check_8bit(value); return; }        
+        CASE("e"):  { std::cout << ssprintf0x00x(value); test->preconditions.reg_e  = check_8bit(value); return; }
         CASE("a_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_a_ = check_8bit(value); return; }
         CASE("h_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_h_ = check_8bit(value); return; }
         CASE("l_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_l_ = check_8bit(value); return; }
         CASE("b_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_b_ = check_8bit(value); return; }
         CASE("c_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_c_ = check_8bit(value); return; }
         CASE("d_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_d_ = check_8bit(value); return; }
-        CASE("e_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_e_ = check_8bit(value); return; }        
+        CASE("e_"): { std::cout << ssprintf0x00x(value); test->preconditions.reg_e_ = check_8bit(value); return; }
 
         CASE("fl_z"): { std::cout << ssprintf_bool(value); test->preconditions.fl_z = check_bit(value); return; }
         CASE("fl_p"): { std::cout << ssprintf_bool(value); test->preconditions.fl_p = check_bit(value); return; }
@@ -331,33 +339,33 @@ void handle_tests(toml::node_view<toml::node> test_section) {
             std::cout << test.name  << "\n";
         }
 
-        // set registers 
+        // set registers
         // TODO: fix setting precondition registers
         for(const std::string &current_reg : REGISTERS) {
             auto reg = section.at_path(current_reg).template value<int>();
 
-            if (reg.has_value()) { 
-                set_precondition_reg(current_reg, *reg, &test); 
+            if (reg.has_value()) {
+                set_precondition_reg(current_reg, *reg, &test);
                 std::cout << "\n";
             } else {
                 reg = section.at_path(string_toupper(current_reg)).template value<int>();
-                if (reg.has_value()) { 
+                if (reg.has_value()) {
                     set_precondition_reg(current_reg, *reg, &test);
                     std::cout << "\n";
-                } 
+                }
             }
         };
 
-        auto init_section = section.at_path("init");        
+        auto init_section = section.at_path("init");
         if (init_section.is_table() && !init_section.as_table()->empty()) {
             build_test_init(init_section, &test);
         }
-        
+
         auto run_section = section.at_path("run");
         build_test_run(run_section, &test);
 
         auto expect_section = section.at_path("expect");
-        
+
         auto expect_registers_section = expect_section.at_path("registers");
         build_test_expect_registers(expect_registers_section, &test);
 
@@ -370,12 +378,12 @@ void handle_tests(toml::node_view<toml::node> test_section) {
 
         auto expect_timing_section = expect_section.at_path("timing");
         build_test_expect_timing(expect_timing_section, &test);
-        
+
         zspec_suit.tests_list.push_back(test);
 
         execute_test_spec(&test, &original_memory_image, &zspec_suit);
 
-        test_idx++; 
+        test_idx++;
         std::cout << "\n";
     });
 }
@@ -425,7 +433,7 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
             } else {
                 std::cerr << Colors::RED << "Constants can be only integers! Found: " << key << " = "sv << value << std::endl;
                 exit(1);
-            }        
+            }
         });
     }
 
@@ -439,16 +447,16 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
             fail(string_format("Cannot open 'labels_file' = %s", labels_file.c_str()));
         }
         int size = ifd.tellg();
-        if (size > MAX_LABELS_FILE_SIZE) 
+        if (size > MAX_LABELS_FILE_SIZE)
             fail(string_format("Labels file: %s is too big!", labels_file.c_str()));
 
         ifd.seekg(0, std::ios::beg);
 
         // parse labels
-        std::filesystem::path file_path = labels_file;   
+        std::filesystem::path file_path = labels_file;
 
         labels_parser(&ifd, file_path.extension().generic_string());
-        
+
         ifd.close();
     }
 }
@@ -458,18 +466,18 @@ void run_tests(const char* path) {
 
     try {
         config = toml::parse_file( path );
-    } catch (toml::parse_error &ex) {   
-        fail_parse_error(ex); 
+    } catch (toml::parse_error &ex) {
+        fail_parse_error(ex);
     }
 
     toml::node_view<toml::node> init_section = config["init"];
     handle_init_section(init_section);
 
     toml::node_view<toml::node> test_sections = config["test"];
-    handle_tests(test_sections); 
+    handle_tests(test_sections);
 
     std::cout << "------------------------------------------------------------------------\n" << std::dec;
-    
+
     int total_tests = zspec_suit.tests_list.size();
     int skipped = zspec_suit.skipped_count;
     int failed = zspec_suit.failed_count;

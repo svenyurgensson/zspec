@@ -38,13 +38,14 @@ labels_file = "examples/main.sld"
         a = 0x00
         a_ = 200
     [[test.expect.memory]]
-        address = 0xff00 
-        value = 0x22
+        address = 0xff00
+        word = true
+        value = 0x2233
     [[test.expect.memory]]
         address = 0x10
         value_not = 0xcf
     [[test.expect.port]]
-        address = 0x1aaf 
+        address = 0x1aaf
         value = 0x00
         series = [0x22, 0xff, 0x00]
     [test.expect.timing]
@@ -56,4 +57,4 @@ labels_file = "examples/main.sld"
     a = 0x44
     [xtest.run]
         fname = "tiles_gen"
-        call = 0x3345    
+        call = 0x3345

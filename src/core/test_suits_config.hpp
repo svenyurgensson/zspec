@@ -12,7 +12,7 @@ struct MemoryImage {
     char mem[0x10000];
 
     std::vector<PredefinedConstant> constants;
-}; 
+};
 
 struct TestClear {
     int start = -1;
@@ -22,7 +22,7 @@ struct TestClear {
 
 struct InitMemory {
     int start = -1;
-    std::vector<int> fill;    
+    std::vector<int> fill;
 };
 
 struct FileInitMemory {
@@ -47,9 +47,9 @@ struct TestRun {
 
 struct TestExpectRegisters {
     int fl_z = -1, fl_p = -1, fl_c = -1;
-    int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1; 
+    int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1;
     int reg_b = -1, reg_b_ = -1, reg_c = -1, reg_c_ = -1, reg_d = -1, reg_d_ = -1,  reg_e = -1, reg_e_ = -1;
-    int reg_ix = -1, reg_iy = -1, reg_sp = -1;      
+    int reg_ix = -1, reg_iy = -1, reg_sp = -1;
 };
 
 struct TestExpectTiming {
@@ -66,6 +66,7 @@ struct TestExpectMemory {
     int address = -1;
     int value = -1;
     int value_not = -1;
+    bool is_word = false;
 };
 
 struct TestExpectPort {
@@ -76,11 +77,11 @@ struct TestExpectPort {
 
 struct TestPreconditions {
     int fl_z = -1, fl_p = -1, fl_c = -1;
-    int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1; 
+    int reg_a = -1, reg_a_ = -1, reg_h = -1, reg_h_ = -1, reg_l = -1, reg_l_ = -1;
     int reg_b = -1, reg_b_ = -1, reg_c = -1, reg_c_ = -1, reg_d = -1, reg_d_ = -1,  reg_e = -1, reg_e_ = -1;
-    int reg_sp = -1;   
+    int reg_sp = -1;
     int reg_ix = -1;
-    int reg_iy = -1;   
+    int reg_iy = -1;
 
     std::vector<TestMemoryState> memory_states;
 };

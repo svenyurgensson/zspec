@@ -21,6 +21,10 @@
         address = "xy2char"
         value = 0x7a
     [[test.expect.memory]]
+        address = "xy2char"
+        word = true
+        value = 0x0f7a
+    [[test.expect.memory]]
         address = 0x0000
         series = [0x00, 0x00, 0x00]
     [test.expect.timing]
@@ -52,7 +56,7 @@
     [test.expect.registers]
         de = 0x4000
     [test.expect.timing]
-        max_ticks = 100   
+        max_ticks = 100
 
 [[test]]
     name = "Calculate screen addr with given char coordinates (23,31)"
@@ -71,7 +75,7 @@
     [test.run]
         fname = "xy2screen"
     [test.expect.registers]
-        de = 0x4000      
+        de = 0x4000
 
 [[test]]
     name = "Calculate screen addr with given X,Y coordinates (191,255)"
@@ -80,5 +84,5 @@
     [test.run]
         fname = "xy2screen"
     [test.expect.registers]
-        de = 0x57FF              
+        de = 0x57FF
 

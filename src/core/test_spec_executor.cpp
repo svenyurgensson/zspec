@@ -29,7 +29,7 @@ void outPort(void* arg, unsigned short port, unsigned char value) {
 void prefill_mem() {
     // copy mem image from loaded bin file
     int start_addr = mem_img->load_addr;
-    char * src = &mem_img->mem[0];    
+    char * src = &mem_img->mem[0];
     int size = mem_img->size;
     memcpy(&mmu_unit->RAM[0], src, sizeof(mem_img->mem));
 
@@ -55,7 +55,7 @@ void prefill_mem() {
 }
 
 void assign_registers() {
-    z80_cpu->reg.pair.F = 0; 
+    z80_cpu->reg.pair.F = 0;
     TestPreconditions * p = &curr_test->preconditions;
 
     if (p->fl_z == 1) z80_cpu->reg.pair.F |= z80_cpu->flagZ();
@@ -72,7 +72,7 @@ void assign_registers() {
     if (p->reg_e != -1) z80_cpu->reg.pair.E = p->reg_e;
     if (p->reg_h != -1) z80_cpu->reg.pair.H = p->reg_h;
     if (p->reg_l != -1) z80_cpu->reg.pair.L = p->reg_l;
-    
+
     if (p->reg_a_ != -1) z80_cpu->reg.back.A = p->reg_a_;
     if (p->reg_b_ != -1) z80_cpu->reg.back.B = p->reg_b_;
     if (p->reg_c_ != -1) z80_cpu->reg.back.C = p->reg_c_;
@@ -93,7 +93,7 @@ void assign_registers() {
 void assign_sp() {
     // find appropriate stack position to run
     top_sp = 0x3FF0; // TODO: temporary
-    z80_cpu->reg.SP = top_sp; 
+    z80_cpu->reg.SP = top_sp;
 
     z80_cpu->addReturnHandler([](void* arg) -> void {
         uint16_t sp = z80_cpu->reg.SP;
@@ -162,21 +162,36 @@ int print_check_regs_expectations() {
     return total_failed;
 }
 
-int print_check_mem_expectations() {    
+int print_check_mem_expectations() {
     int faults = 0;
 
     for (auto exp : curr_test->memory_expectations) {
         int addr = exp.address;
         int mem_value = mmu_unit->RAM[addr];
+        if (exp.is_word) {
+            mem_value += 256 * mmu_unit->RAM[addr+1];
+        }
 
         if (exp.value != -1) {
             if (mem_value == exp.value) {
-                std::cout << Colors::GREEN << "    RAM @ addr " << ssprintf0x0000x(addr) << " must be: " << ssprintf0x00x(exp.value) << ", actual: " << ssprintf0x00x(mem_value) << Colors::RESET << "\n";
+                std::cout << Colors::GREEN << "    RAM @ addr " << ssprintf0x0000x(addr) << " must be: ";
+                if (exp.is_word) {
+                    std::cout << ssprintf0x0000x(exp.value) << ", actual: " << ssprintf0x0000x(mem_value);
+                } else {
+                    std::cout << ssprintf0x00x(exp.value) << ", actual: " << ssprintf0x00x(mem_value);
+                }
+                std::cout << Colors::RESET << "\n";
             } else {
-                std::cout << Colors::RED << "    RAM @ addr " << ssprintf0x0000x(addr) << " must be: " << ssprintf0x00x(exp.value) << ", but actual: " << ssprintf0x00x(mem_value) << Colors::RESET << "\n";
+                std::cout << Colors::RED << "    RAM @ addr " << ssprintf0x0000x(addr) << " must be: ";
+                 if (exp.is_word) {
+                    std::cout << ssprintf0x0000x(exp.value) << ", but actual: " << ssprintf0x0000x(mem_value);
+                } else {
+                    std::cout << ssprintf0x00x(exp.value) << ", but actual: " << ssprintf0x00x(mem_value);
+                }
+                std::cout << Colors::RESET << "\n";
                 faults += 1;
             }
-        } 
+        }
         if (exp.value_not != -1) {
             if (mem_value != exp.value_not) {
                 std::cout << Colors::GREEN << "    RAM @ addr " << ssprintf0x0000x(addr) << " must not be equal: " << ssprintf0x00x(exp.value) << ", actual: " << ssprintf0x00x(mem_value) << Colors::RESET << "\n";
@@ -221,15 +236,15 @@ int print_check_timing_expectations(int curr_tick) {
     return 0;
 }
 
-void execute_test_spec(SingleTest* test, MemoryImage* m, ZTest* suit) {  
+void execute_test_spec(SingleTest* test, MemoryImage* m, ZTest* suit) {
     if (test->is_skipped) {
         std::cout << Colors::BLUE << "Skip test: " << test->name << Colors::RESET << "\n\n";
         return;
-    } 
+    }
     mem_img = m;
     std::cout << Colors::CYAN << "  running test..." << Colors::RESET << "\n";
 
-    curr_test = test;    
+    curr_test = test;
     mmu_unit = new MMU();
     z80_cpu = new Z80(readByte, writeByte, inPort, outPort, mmu_unit);
     mmu_unit->cpu = z80_cpu;
@@ -250,9 +265,9 @@ void execute_test_spec(SingleTest* test, MemoryImage* m, ZTest* suit) {
     });
 
     int max_ticks = MAX_TICKS_PER_TEST;
-    if (test->test_run.max_ticks != -1) max_ticks = test->test_run.max_ticks; 
+    if (test->test_run.max_ticks != -1) max_ticks = test->test_run.max_ticks;
 
-    // run CPU ticks loop 
+    // run CPU ticks loop
     int total_ticks = 0;
 
     while (!is_finished) {
@@ -260,7 +275,7 @@ void execute_test_spec(SingleTest* test, MemoryImage* m, ZTest* suit) {
 
         total_ticks += z80_cpu->execute(1);
     }
-    
+
     int faults_count = 0;
     // save registers and compare with expectations
     faults_count += print_check_regs_expectations();
