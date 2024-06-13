@@ -10,7 +10,7 @@
 #include "labels_parser.hpp"
 #include "test_spec_executor.hpp"
 
-void run_tests(const char* path);
+void run_tests(const char* path, int test_to_run);
 
 constexpr int MAX_LOAD_ADDRESS = 0xFFFF;
 constexpr int MAX_BIN_SIZE = 0x10000;

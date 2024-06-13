@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(REV 1.0.2)
+set(REV 1.0.4)
 
 add_definitions(-DBUILD_REVISION="${REV}")
 
@@ -23,9 +23,9 @@ include(CPack)
 add_compile_definitions(TOML_EXCEPTIONS=1)
 
 set(SOURCE_FILES
-    src/core/test_spec_executor.cpp  
+    src/core/test_spec_executor.cpp
     src/core/parser.cpp
-    src/main.cpp  
+    src/main.cpp
 )
 set(INCLUDES "/usr/local/Cellar/gcc/14.1.0/include")
 

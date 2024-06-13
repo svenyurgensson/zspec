@@ -63,10 +63,10 @@ struct TestMemoryState {
 };
 
 struct TestExpectMemory {
+    bool is_word = false;
     int address = -1;
     int value = -1;
     int value_not = -1;
-    bool is_word = false;
 };
 
 struct TestExpectPort {
@@ -111,6 +111,7 @@ struct SingleTest {
 struct ZTest {
     MemoryImage memory_image;
     std::vector<SingleTest> tests_list;
+    int total_count = 0;
     int skipped_count = 0;
     int failed_count = 0;
 };

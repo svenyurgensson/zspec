@@ -313,11 +313,11 @@ void set_precondition_reg(std::string current_reg, int value, SingleTest* test) 
 }
 
 
-void handle_tests(toml::node_view<toml::node> test_section) {
+void handle_tests(toml::node_view<toml::node> test_section, int test_to_run) {
     if (!test_section.is_array_of_tables()) fail("'[[test]]' section(s) not found!");
     std::cout << "\n";
 
-    test_section.as_array()->for_each([](auto& section, int test_idx) {
+    test_section.as_array()->for_each([&test_to_run](auto& section, int test_idx) {
         SingleTest test = { .is_skipped = false };
 
         const toml::table& sec = *section.as_table();
@@ -328,7 +328,14 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         std::printf("[test][%.3i]: ", test_idx+1);
 
         auto skipped_name = sec["xname"].value_or("#"sv);
-        if (sec["xname"].is_string()) {
+
+        bool need_skip = ((test_to_run !=0) &&
+                          (test_to_run != (test_idx + 1))) ||
+                          sec["xname"].is_string();
+
+        zspec_suit.total_count += 1;
+
+        if (need_skip) {
             test.is_skipped = true;
             test.name = skipped_name;
             std::cout << Colors::BLUE << test.name  << " (skipped)" << Colors::RESET << "\n";
@@ -461,7 +468,7 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
     }
 }
 
-void run_tests(const char* path) {
+void run_tests(const char* path, int test_to_run) {
     toml::parse_result config;
 
     try {
@@ -474,11 +481,11 @@ void run_tests(const char* path) {
     handle_init_section(init_section);
 
     toml::node_view<toml::node> test_sections = config["test"];
-    handle_tests(test_sections);
+    handle_tests(test_sections, test_to_run);
 
     std::cout << "------------------------------------------------------------------------\n" << std::dec;
 
-    int total_tests = zspec_suit.tests_list.size();
+    int total_tests = zspec_suit.total_count;
     int skipped = zspec_suit.skipped_count;
     int failed = zspec_suit.failed_count;
     int passed = total_tests - (skipped + failed);

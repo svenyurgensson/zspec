@@ -19,10 +19,19 @@ int main(int argc, char** argv) {
     }
 
     const auto path = parser.get_default<std::string>();
+    std::vector<std::string> file_line = split_string(path, ':');
+    auto filepath = file_line[0];
+    int test_to_run = 0;
 
-    if (! std::filesystem::exists(path)) {
-        std::cout << Colors::RED << "File '" << path << "' not found!\n"  << Colors::RESET;
+    try {
+        test_to_run = (int)std::strtoul(file_line[1].c_str(), nullptr, 10);
+    } catch (const std::exception& e) {
+       test_to_run = 0;
     }
 
-    run_tests(path.c_str());  
+    if (! std::filesystem::exists(filepath)) {
+        std::cout << Colors::RED << "File '" << filepath << "' not found!\n"  << Colors::RESET;
+    }
+
+    run_tests(filepath.c_str(), test_to_run);
 }

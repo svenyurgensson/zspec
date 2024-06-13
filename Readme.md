@@ -101,10 +101,16 @@ So I decided to make this one mainly with intention if someone wiser then me cam
 ## Getting Started
 
 * Write some library with functions using you lovely compiler: c or asm or something other
-* Compile it, export binary image and labels file 
+* Compile it, export binary image and labels file
 * Write specification, using simple language based on [Toml][toml-url] syntax
-* Run `zspec` 
+* Run `zspec path/to/ypur-zspec.toml`
 * You have results of calling your code in tradition `green`/`red` style
+
+BTW it is also possible run just one test from a few:
+
+    zspec path/to/ypur-zspec.toml:5
+
+it will run 5-th test, skipping others.
 
 ### Prerequisites
 
