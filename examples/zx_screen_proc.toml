@@ -17,6 +17,12 @@
     [test.expect.registers]
         fl_c = false
         hl = 0x4100
+    [[test.expect.memory]]
+        address = "xy2char"
+        value = 0x7a
+    [[test.expect.memory]]
+        address = 0x0000
+        series = [0x00, 0x00, 0x00]
     [test.expect.timing]
         max_ticks = 100
 

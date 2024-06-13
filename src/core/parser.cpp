@@ -179,37 +179,67 @@ void build_test_expect_memory(toml::node_view<toml::node> section, SingleTest * 
     if (!section.is_array_of_tables()) return;
 
     section.as_array()->for_each([&test](auto& el) {
-        auto address   = el.at_path("address").template value<int64_t>();
+        auto address   = el.at_path("address");
         auto value     = el.at_path("value").template value<int64_t>();
         auto value_not = el.at_path("value_not").template value<int64_t>();
-        
-        if (!address.has_value())
+        auto series    = el.at_path("series");
+
+        if (!address.is_value())
             fail(string_format("Error in test: '%s'. Memory expectation must have 'address' to check!", test->name.c_str())); 
-        int addr = * address;
+
+        int addr = -1;
+        if (address.is_integer()) addr = address.as_integer()->operator const int64_t & ();
+        if (address.is_string()) {
+            std::string fname = address.as_string()->operator const std::string & ();
+            auto iter = std::find_if(original_memory_image.constants.begin(), original_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
+        
+            if (iter == original_memory_image.constants.end())
+                fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str())); 
+            int index = std::distance(original_memory_image.constants.begin(), iter);                   
+            addr = original_memory_image.constants[index].value;
+        }
+         
         if (addr > MAX_LOAD_ADDRESS || addr < 0)
-            fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), addr, MAX_LOAD_ADDRESS)); 
+            fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), addr, MAX_LOAD_ADDRESS));       
 
-        if (value.has_value() && value_not.has_value())
-            fail(string_format("Error in test: '%s'. Memory expectation 'value' and 'value_not' cannot be defined simultaneously!", test->name.c_str()));     
-        if (!value.has_value() && !value_not.has_value())
-            fail(string_format("Error in test: '%s'. Memory expectation 'value' or 'value_not' have to be defined!", test->name.c_str()));     
+        if (series.is_array() && series.is_homogeneous(toml::node_type::integer)) {
+            int idx = addr;
+            series.as_array()->for_each([&test, &idx](auto& el) {
+                auto val = el.as_integer()->operator const int64_t & ();
+                if (val > 0xFF || val < 0)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds 0xFF!", test->name.c_str(), val));                
+                if (idx > MAX_LOAD_ADDRESS)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'address'=%d exceeds max address: %d!", test->name.c_str(), idx, MAX_LOAD_ADDRESS));       
 
-        TestExpectMemory expm;
+                TestExpectMemory expm = TestExpectMemory{ .address = idx, .value = static_cast<int>(val) };
+                test->memory_expectations.push_back(expm);
+                idx += 1;
+            });
 
-        if (value.has_value()) {
-            int val = * value;
-            if (val > 0xFF || addr < 0)
-                fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds 0xFF!", test->name.c_str(), val)); 
-            expm = TestExpectMemory{ .address = addr, .value = val };
-        }
-        if (value_not.has_value()) {
-            int val = * value_not;
-            if (val > 0xFF || addr < 0)
-                fail(string_format("Error in test: '%s'. Memory expectation 'value_not'=%d exceeds 0xFF!", test->name.c_str(), val)); 
-            expm = TestExpectMemory{ .address = addr, .value_not = val };
-        }
+        } else {
 
-        test->memory_expectations.push_back(expm);
+            if (value.has_value() && value_not.has_value())
+                fail(string_format("Error in test: '%s'. Memory expectation 'value' and 'value_not' cannot be defined simultaneously!", test->name.c_str()));     
+            if (!value.has_value() && !value_not.has_value())
+                fail(string_format("Error in test: '%s'. Memory expectation 'value' or 'value_not' have to be defined!", test->name.c_str()));                 
+
+            TestExpectMemory expm;
+
+            if (value.has_value()) {
+                int val = * value;
+                if (val > 0xFF || val < 0)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'value'=%d exceeds 0xFF!", test->name.c_str(), val)); 
+                expm = TestExpectMemory{ .address = addr, .value = val };
+            }
+            if (value_not.has_value()) {
+                int val = * value_not;
+                if (val > 0xFF || val < 0)
+                    fail(string_format("Error in test: '%s'. Memory expectation 'value_not'=%d exceeds 0xFF!", test->name.c_str(), val)); 
+                expm = TestExpectMemory{ .address = addr, .value_not = val };
+            }
+
+            test->memory_expectations.push_back(expm);
+        }        
     });
 } 
 
@@ -332,6 +362,7 @@ void handle_tests(toml::node_view<toml::node> test_section) {
         build_test_expect_registers(expect_registers_section, &test);
 
         auto expect_memory_section = expect_section.at_path("memory");
+
         build_test_expect_memory(expect_memory_section, &test);
 
         auto expect_ports_section = expect_section.at_path("port");

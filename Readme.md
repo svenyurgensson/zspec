@@ -136,6 +136,7 @@ _For more examples, please refer to the [Examples](https://github.com/svenyurgen
 ## Roadmap
 
 - [ ] Add ability to load binary file for memory comparing expectations
+- [x] Memory series expectations
 - [ ] Add ports expectations
 - [x] Add command line params
 - [ ] More documentation and examples

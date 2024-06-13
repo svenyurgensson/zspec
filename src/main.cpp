@@ -9,6 +9,7 @@ void configure_parser(cli::Parser& parser) {
 int main(int argc, char** argv) {
     cli::Parser parser(argc, argv);
     configure_parser(parser);
+    parser.set_default<std::string>(false, "Path to .toml spec file", "zspec.toml");
     parser.run_and_exit_if_error();
 
     auto ver = parser.get<bool>("v");
@@ -16,14 +17,12 @@ int main(int argc, char** argv) {
         std::cout << "ZSpec version: " << ZSPEC_VERSION << "\n";
         exit(0);
     }
-    
 
-    const auto path = argc > 1 ? argv[1] : "zspec.toml";
+    const auto path = parser.get_default<std::string>();
 
     if (! std::filesystem::exists(path)) {
         std::cout << Colors::RED << "File '" << path << "' not found!\n"  << Colors::RESET;
     }
 
-
-    run_tests(path);  
+    run_tests(path.c_str());  
 }
