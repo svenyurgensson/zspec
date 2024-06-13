@@ -87,6 +87,8 @@ So I decided to make this one mainly with intention if someone wiser then me cam
 
 * [Z80 emulator library][z80-emul-url]
 * [TomlPlusPlus parser library][tomlplusplus-url]
+* [Command line parser library][cmdparser-url]
+* [Docker cross-compilers suit][dockcross-url]
 * [Toml][toml-url]
 * C++ compiler
 
@@ -133,7 +135,8 @@ _For more examples, please refer to the [Examples](https://github.com/svenyurgen
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Add ability to load binary file for expectations
+- [ ] Add ability to load binary file for memory comparing expectations
+- [ ] Add ports expectations
 - [x] Add command line params
 - [ ] More documentation and examples
 
@@ -206,3 +209,5 @@ Project Link: [https://github.com/svenyurgensson/zspec](https://github.com/sveny
 [z80-emul-url]: https://github.com/suzukiplan/z80
 [toml-url]: https://toml.io/en/
 [tomlplusplus-url]: https://github.com/marzer/tomlplusplus
+[cmdparser-url]: https://github.com/FlorianRappl/CmdParser
+[dockcross-url]: https://github.com/dockcross/dockcross

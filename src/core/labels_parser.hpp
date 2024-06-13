@@ -28,11 +28,12 @@ static void parse_sld_type(std::ifstream *labels_stream) {
     std::getline(*labels_stream, line);
     std::getline(*labels_stream, line);
     std::getline(*labels_stream, line); // skip first 3 lines
+
     std::cout << std::hex;
 
     for (;std::getline(*labels_stream, line);) {
         std::vector<std::string> line_arr = split_string(line, '|'); 
-        if (line_arr[5] == "F") {
+        if (line_arr[5] == "F" || line_arr[5] == "D") { // Function or Definition
             int addr = std::stoi(line_arr[4]);
             std::cout << "    " << ssprintf0x0000x(addr) << " " << line_arr[6] << "\n";
             PredefinedConstant pc = { .name = line_arr[6], .value = addr };
