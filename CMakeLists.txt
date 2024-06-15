@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(REV 1.0.4)
+set(REV 1.0.6)
 
 add_definitions(-DBUILD_REVISION="${REV}")
 

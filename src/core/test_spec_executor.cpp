@@ -43,7 +43,7 @@ void prefill_mem() {
         if (mi.start == -1) continue;
         int i = 0;
         for (auto f : mi.fill) {
-            mmu_unit->RAM[mi.start + i] = (char)f;
+            mmu_unit->RAM[mi.start + i] = (uint8_t)f;
             i++;
         }
     }

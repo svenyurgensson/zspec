@@ -6,3 +6,4 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 CTestTestfile.cmake
 Win32
+zspec

@@ -43,15 +43,19 @@ void build_test_init(toml::node_view<toml::node> section, SingleTest * test) {
                 fail(string_format("Error in test: '%s'. Cannot use 'fill' and 'file' directives simultaneously!", test->name.c_str()));
 
             if (fill.is_array()) { // fill memory with array of bytes
-                auto fill_arr = fill.as_array();
-                std::cout << "fill at: " << *start << " with: " << fill << "\n";
+                toml::array& fill_arr = *el.template get_as<toml::array>("fill");
+                std::cout << "    fill at: " << ssprintf0x0000x(*start) << " with: " << fill << "\n";
                 InitMemory imem;
                 imem.start = *start;
-                auto iter = std::find_if(fill_arr->begin(), fill_arr->end(), [&imem] (const auto& v) {
-                    return v.is_integer() &&
-                            check_8bit(* v.template value<int>()) &&
-                            (([&imem](const auto& vv) { imem.fill.push_back(* vv.template value<int>()); return true; })(v));
-                });
+                for (auto&& elm : fill_arr) {
+                    if (elm.is_integer()) {
+                        int v = * elm.template value<int>();
+                        check_8bit(v);
+                        imem.fill.push_back(v);
+                    } else {
+                        fail(string_format("Error in test: '%s'. Element 'fill' should contains only integer values!", test->name.c_str()));
+                    }
+                }
                 test->initializer.memory_initializers.push_back(imem);
 
             } else if (file.has_value()) { // fill memory from binary file
@@ -129,7 +133,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
 
 void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTest * test) {
     if (!exp_regs.is_table())
-        std::cout << "exp regs: " << exp_regs << "\n";
+        return;
     exp_regs.as_table()->for_each([&test](auto& key, auto& val) {
         std::string current_reg = string_tolower((std::string)key.str());
         if (!(val.is_integer() || val.is_boolean()))
