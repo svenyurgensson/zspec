@@ -6,6 +6,7 @@
 #include "../../libs/Colors.hpp"
 #include "../../libs/toml.hpp"
 #include "../../libs/utils.hpp"
+#include "../../libs/cross_runner.hpp"
 #include "test_suits_config.hpp"
 #include "labels_parser.hpp"
 #include "test_spec_executor.hpp"

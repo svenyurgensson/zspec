@@ -86,7 +86,7 @@ struct TestPreconditions {
     std::vector<TestMemoryState> memory_states;
 };
 
-enum TRESULT { PASS, FAIL, ERROR, SKIP };
+enum TRESULT { PASS, FAIL, SKIP };
 
 struct TestResult {
     TRESULT code;

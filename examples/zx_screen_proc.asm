@@ -6,8 +6,8 @@
     SLDOPT COMMENT WPMEM, LOGPOINT, ASSERTION
 
     ORG 0xC000
-    
-; in: 
+
+; in:
 ;   hl - screen address
 ; out:
 ;   hl - screen address, one pixel lower
@@ -26,7 +26,7 @@ down_hl:
         add a,$20
         ld l,a
         ret nc
-        
+
         ld a,h
         add a,$08
         ld h,a
@@ -38,11 +38,11 @@ down_hl:
         ret
 
 ; brief: Converts pixel coord (x,y) to screen address
-; in: 
+; in:
 ;   H: y(0..192), L: x(0..255)
 ; out:
 ;   DE at corresponding byte in the screen
-xy2screen:	
+xy2screen:
         ld a,h
         rra
         rra
@@ -69,11 +69,11 @@ xy2screen:
         ret
 
 ; brief: Converts screen char coord (x,y) to screen address
-; in: 
+; in:
 ;   D: y(0..23), E: x(0..31)
 ; out:
 ;   DE at corresponding byte in the screen
-xy2char:	
+xy2char:
         ld a,d
         rrca
         rrca
@@ -87,4 +87,4 @@ xy2char:
         ld d,a
         ret
 
-    SAVEBIN 'zs_screen_proc.bin', down_hl        
+    SAVEBIN 'examples/zs_screen_proc.bin', down_hl

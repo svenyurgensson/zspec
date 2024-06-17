@@ -407,6 +407,30 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
     if (load_addr < 0) fail("'load_address' cannot be less then 0!");
     original_memory_image.load_addr = *load_addr;
 
+    // maybe build content
+    auto build = init_section["build"];
+    if (build.is_array()) {
+        if (build.as_array()->size() < 1)
+            fail("Error! Parameter 'build' must be array of strings: filename of external program and it`s arguments, but it is empty!");
+
+        std::vector<std::string> argv;
+        build.as_array()->for_each([&build, &argv](auto& el) {
+            if constexpr (toml::is_string<decltype(el)>) {
+                argv.push_back(*el);
+            } else {
+                std::cout << Colors::RED << build << Colors::RESET << "\n";
+                fail("Error! Parameter 'build' must be array of strings, example:\nbuild = [\"external_program\", \"--arg1\", \"value\", \"-o\", \"outfile\" ]\nbut you provided wrong value!");
+            }
+        });
+        auto cmd = new CommandLine(argv[0]);
+        for (int i = 1; i < argv.size(); i++) cmd->arg(argv[i]);
+        std::cout << Colors::YELLOW << "Run external program: " << cmd->getCommandlineString() << "\n";
+        int result = cmd->executeAndWait(0, 0, 0);
+        if (result !=0)
+            fail("Error running external program!");
+        std::cout << Colors::RESET;
+    }
+
     // load content
     auto bin_file = init_section["bin_file"].value<std::string>();
     if (!bin_file.has_value()) fail("'bin_file' not found in [init] section!");
@@ -465,7 +489,7 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
 
         // parse labels
         std::filesystem::path file_path = labels_file;
-
+        std::cout << "Parsing labels: " << file_path << Colors::MAGENTA << "\n";
         labels_parser(&ifd, file_path.extension().generic_string());
 
         ifd.close();
