@@ -7,6 +7,8 @@ void configure_parser(cli::Parser& parser) {
 }
 
 int main(int argc, char** argv) {
+    std::cout << "ZSpec testing framework by Yury Batenko © 2024++\n";
+
     cli::Parser parser(argc, argv);
     configure_parser(parser);
     parser.set_default<std::string>(false, "Path to .toml spec file", "zspec.toml");
@@ -33,5 +35,6 @@ int main(int argc, char** argv) {
         std::cout << Colors::RED << "File '" << filepath << "' not found!\n"  << Colors::RESET;
     }
 
+    std::cout << "Run tests suit: " << filepath << "\n\n";
     run_tests(filepath.c_str(), test_to_run);
 }

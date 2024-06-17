@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include <cctype>
 #include <string>
 #include <stdexcept>
@@ -13,7 +13,7 @@ static std::string ssprintf0x00x(uint8_t p) {
    std::stringstream ss;
 
    ss << "0x"
-      << std::hex << std::internal << std::setw(2) 
+      << std::hex << std::internal << std::setw(2)
       << std::setfill('0')
       << (uint64_t)p << std::dec;
 
@@ -24,7 +24,7 @@ static std::string ssprintf0x0000x(uint16_t p) {
    std::stringstream ss;
 
    ss << "0x"
-      << std::hex << std::internal << std::setw(4) 
+      << std::hex << std::internal << std::setw(4)
       << std::setfill('0')
       << (uint64_t)p  << std::dec;
 
@@ -41,13 +41,13 @@ static inline std::string ssprintf_bool(uint8_t p) {
 
 static std::vector<std::string> split_string(std::string str, char splitter) {
     std::vector<std::string> result;
-    std::string current = ""; 
+    std::string current = "";
     for(int i = 0; i < str.size(); i++){
         if(str[i] == splitter){
             if(current != ""){
                 result.push_back(current);
                 current = "";
-            } 
+            }
             continue;
         }
         current += str[i];
@@ -58,26 +58,26 @@ static std::vector<std::string> split_string(std::string str, char splitter) {
 }
 
 static inline std::string string_toupper(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), 
+    std::transform(s.begin(), s.end(), s.begin(),
                    [](unsigned char c){ return std::toupper(c); }
                   );
     return s;
 }
 
 static inline std::string string_tolower(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), 
+    std::transform(s.begin(), s.end(), s.begin(),
                    [](unsigned char c){ return std::tolower(c); }
                   );
     return s;
 }
 
 static inline void fail(std::string str) {
-    std::cerr << Colors::RED << str << Colors::RESET;
+    std::cerr << Colors::RED << str << Colors::RESET << "\n";
     exit(1);
 }
 
 static inline void warn(std::string str) {
-    std::cerr << Colors::YELLOW << str << Colors::RESET;
+    std::cerr << Colors::YELLOW << str << Colors::RESET << "n";
 }
 
 static inline void fail_parse_error(toml::parse_error& err) {
@@ -95,13 +95,13 @@ static std::basic_string<T> string_format(T const* const format, Args ... args)
 {
     int size_signed{ 0 };
 
-    // 1) Determine size with error handling:    
+    // 1) Determine size with error handling:
     if constexpr (std::is_same_v<T, char>) { // C++17
         size_signed = std::snprintf(nullptr, 0, format, args ...);
     }
     else {
         size_signed = std::swprintf(nullptr, 0, format, args ...);
-    }  
+    }
     if (size_signed <= 0) {
         throw std::runtime_error("error during formatting.");
     }
@@ -116,7 +116,7 @@ static std::basic_string<T> string_format(T const* const format, Args ... args)
         std::swprintf(formatted.data(), size + 1, format, args ...); // +1 for the '\0' (it will not be part of formatted).
     }
 
-    return formatted; // Named Return Value Optimization (NRVO), avoids an unnecessary copy. 
+    return formatted; // Named Return Value Optimization (NRVO), avoids an unnecessary copy.
 }
 
 // string_format("string. number %d.", 10)

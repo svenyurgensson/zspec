@@ -109,7 +109,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
         auto iter = std::find_if(original_memory_image.constants.begin(), original_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
 
         if (iter == original_memory_image.constants.end())
-             fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str()));
+             fail(string_format("Cannot found definition for fname or label: '%s' in test: '%s'", fname.c_str(), test->name.c_str()));
         int index = std::distance(original_memory_image.constants.begin(), iter);
         constant_function_name = fname;
         test->test_run.call = original_memory_image.constants[index].value;
@@ -120,12 +120,12 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
         if (call.has_value()) {
             int call_addr = *call;
             if (call_addr >= MAX_BIN_SIZE || call_addr < 0)
-                fail(string_format("Start address %d is wrong for test: %s", call_addr, test->name.c_str()));
+                fail(string_format("Start address %d is wrong in test: %s", call_addr, test->name.c_str()));
 
             test->test_run.call = call_addr;
 
         } else {
-            fail(string_format("Start address or function to run is not found for test: %s", test->name.c_str()));
+            fail(string_format("Start address or function to run is not found in test: %s", test->name.c_str()));
         }
     }
     std::cout << "    run " << constant_function_name << Colors::CYAN << "@" << Colors::RESET << ssprintf0x0000x(test->test_run.call) << "\n";
@@ -199,7 +199,7 @@ void build_test_expect_memory(toml::node_view<toml::node> section, SingleTest * 
             auto iter = std::find_if(original_memory_image.constants.begin(), original_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
 
             if (iter == original_memory_image.constants.end())
-                fail(string_format("Cannot found definition for fname: '%s' for test: '%s'", fname.c_str(), test->name.c_str()));
+                fail(string_format("Cannot found definition for fname or label: '%s' in test: '%s'", fname.c_str(), test->name.c_str()));
             int index = std::distance(original_memory_image.constants.begin(), iter);
             addr = original_memory_image.constants[index].value;
         }
