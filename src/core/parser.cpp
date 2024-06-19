@@ -98,7 +98,7 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
     auto max_ticks = section.at_path("max_ticks").template value<int>();
     if (max_ticks.has_value()) {
         int max_ticks_val = *max_ticks;
-        if (max_ticks_val > MAX_BIN_SIZE || max_ticks_val < 0) fail("Wrong 'max_ticks' value in section [test.run]!");
+        if (max_ticks_val > MAX_CPU_TICKS_PER_TEST || max_ticks_val < 0) fail(string_format("Wrong 'max_ticks' value:  in section [test.run]!", max_ticks_val));
         test->test_run.max_ticks = max_ticks_val;
     }
 
@@ -429,7 +429,10 @@ void handle_init_section(toml::node_view<toml::node> init_section) {
         if (result !=0)
             fail("Error running external program!");
         std::cout << Colors::RESET;
-    }
+    } else
+        if (build.is_value()) {
+            fail("Error! Parameter 'build' must be array of strings: filename of external program and it`s arguments, but it is not array!");
+        }
 
     // load content
     auto bin_file = init_section["bin_file"].value<std::string>();
