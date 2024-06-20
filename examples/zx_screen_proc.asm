@@ -43,30 +43,30 @@ down_hl:
 ; out:
 ;   DE at corresponding byte in the screen
 xy2screen:
-        ld a,h
-        rra
-        rra
-        rra
-        and 24
-        or 64
-        ld d,a
-        ld a,h
-        and 7
-        or d
-        ld d,a
-        ld a,h
-        rla
-        rla
-        and 224
-        ld e,a
-        ld a,l
-        rra
-        rra
-        rra
-        and 31
-        or e
-        ld e,a
-        ret
+        LD A,H
+        RRA
+        RRA
+        RRA
+        AND 24
+        OR 64
+        LD D,A
+        LD A,H
+        AND 7
+        OR D
+        LD D,A
+        LD A,H
+        RLA
+        RLA
+        AND 224
+        LD E,A
+        LD A,L
+        RRA
+        RRA
+        RRA
+        AND 31
+        OR E
+        LD E,A
+        RET
 
 ; brief: Converts screen char coord (x,y) to screen address
 ; in:

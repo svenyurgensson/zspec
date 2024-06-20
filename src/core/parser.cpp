@@ -129,6 +129,13 @@ void build_test_run(toml::node_view<toml::node> section, SingleTest * test) {
         }
     }
     std::cout << "    run " << constant_function_name << Colors::CYAN << "@" << Colors::RESET << ssprintf0x0000x(test->test_run.call) << "\n";
+
+    auto run_count = section.at_path("repeat").template value<int>();
+    if (run_count.has_value()) {
+        int repeat = *run_count;
+        if (repeat > MAX_RUN_COUNT || repeat < 1) fail(string_format("Wrong 'repeat' value: %d in section [test.run], maximum is: %d!", repeat, MAX_RUN_COUNT));
+        test->repeat = repeat;
+    } else test->repeat = 1;
 }
 
 void build_test_expect_registers(toml::node_view<toml::node> exp_regs, SingleTest * test) {

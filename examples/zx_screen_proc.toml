@@ -83,6 +83,7 @@
     l = 255
     [test.run]
         fname = "xy2screen"
+        repeat = 10
     [test.expect.registers]
         de = 0x57FF
 

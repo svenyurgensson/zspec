@@ -97,6 +97,7 @@ struct SingleTest {
     std::string name;
     bool is_skipped = false;
     TestRun test_run;
+    int repeat = 1;
     TestPreconditions preconditions;
     TestInit initializer;
 

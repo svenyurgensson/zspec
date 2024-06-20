@@ -242,40 +242,43 @@ void execute_test_spec(SingleTest* test, MemoryImage* m, ZTest* suit) {
         return;
     }
     mem_img = m;
-    std::cout << Colors::CYAN << "  running test..." << Colors::RESET << "\n";
+    if (test->repeat > 1)
+        std::cout << Colors::CYAN << "  running test... (repeating: " << test->repeat << ")" << Colors::RESET << "\n";
+    else
+        std::cout << Colors::CYAN << "  running test..." << Colors::RESET << "\n";
 
     curr_test = test;
     mmu_unit = new MMU();
     z80_cpu = new Z80(readByte, writeByte, inPort, outPort, mmu_unit);
     mmu_unit->cpu = z80_cpu;
     is_finished = false;
-
-    // copy memory image and init memory with preconditions
-    prefill_mem();
-
-    // set registers
-    assign_registers();
-
-    // set SP
-    assign_sp();
-
     // set breakpoints on RST0 0xC7
     z80_cpu->addBreakOperand(0xC7, [](void* arg, unsigned char* opcode, int opcodeLength) -> void {
         is_finished = true;
     });
-
-    int max_ticks = MAX_TICKS_PER_TEST;
-    if (test->test_run.max_ticks != -1) max_ticks = test->test_run.max_ticks;
-
     // run CPU ticks loop
     int total_ticks = 0;
 
-    while (!is_finished) {
-        if (total_ticks >= max_ticks) { is_finished = true; break; }
+    // copy memory image and init memory with preconditions
+    prefill_mem();
 
-        total_ticks += z80_cpu->execute(1);
+    for (int i = 0; i < test->repeat; i++) {
+        // set registers
+        assign_registers();
+
+        // set SP
+        assign_sp();
+
+        int max_ticks = MAX_TICKS_PER_TEST;
+        if (test->test_run.max_ticks != -1) max_ticks = test->test_run.max_ticks;
+
+        while (!is_finished) {
+            if (total_ticks >= max_ticks) { is_finished = true; break; }
+
+            total_ticks += z80_cpu->execute(1);
+        }
+        is_finished = false;
     }
-
     int faults_count = 0;
     // save registers and compare with expectations
     faults_count += print_check_regs_expectations();
