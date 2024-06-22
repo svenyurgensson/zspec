@@ -29,7 +29,16 @@ void build_test_init(toml::node_view<toml::node> section, SingleTest * test) {
     memory_inits.as_array()->for_each([&test](auto& el) {
         if constexpr (toml::is_table<decltype(el)>) {
             const toml::table& cur_mem_init = *el.as_table();
+
             std::optional<int64_t> start = cur_mem_init["start"].value<int>();
+            if (!start.has_value() && cur_mem_init["start"].is_string()) {
+                std::string fname = cur_mem_init["start"].as_string()->operator const std::string & ();
+                auto iter = std::find_if(original_memory_image.constants.begin(), original_memory_image.constants.end(), [&fname] (const PredefinedConstant& v) { return v.name == fname; });
+                if (iter == original_memory_image.constants.end())
+                    fail(string_format("Cannot found definition for fname or label: '%s' in test: '%s'", fname.c_str(), test->name.c_str()));
+                int index = std::distance(original_memory_image.constants.begin(), iter);
+                start = original_memory_image.constants[index].value;
+            }
             if (!start.has_value()) fail(string_format("Error in test: '%s'. Memory start address for initializing must be provided!", test->name.c_str()));
             check_16bit(*start);
 

@@ -119,8 +119,8 @@ int compare_print_flag(std::string entity_name, int expected, uint8_t actual) {
     if (expected == -1) return 0;
     uint8_t expected_ch = (uint8_t)expected;
 
-    std::string exp = "false", act = "true";
-    if (expected) exp = "true";
+    std::string exp = "false", act = "false";
+    if (expected_ch) exp = "true";
     if (actual) act = "true";
 
     if (expected_ch == actual) {
