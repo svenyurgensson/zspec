@@ -130,7 +130,148 @@ Or, instead you could take compiled version from `releases` folder.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-WIP
+ZSpec Toml file with comments:
+
+    # Init is mandatory section where main test prerequisites should be placed
+    [init]
+
+        build = ["bin/run_zspec", "classic_screen",
+    """
+    const word START = 0xC000
+    import lib/platform/classic/gfx/screen
+    void main() @ START {
+        Screen.pix.clear()
+        Screen.full.clear()
+        Screen.attr.fill(0)
+        Screen.calc.line.down.de()
+        Screen.calc.line.up.de()
+        Screen.calc.line.down.hl()
+        Screen.calc.line.up.hl()
+        Screen.xy2screen(0, 0)
+        Screen.xy2char(0, 0)
+    }
+    """
+        ]
+
+        # 'build' just runner for external programms, and if presents it have to be array of strings:
+        # build[0] - filepath to external programm
+        # build[1...] - arguments, given to that program
+        # it runs before all tests and if in successful state ZSpect continue to work
+        # Here we see example of calling external programm 'bin/run_zspec' which got with source of test bootstrap
+        # code, this program save it into the temporary file, compile and if success returns with OK status to ZSpec
+        # optional
+
+        bin_file = "tmp/test/main.bin"
+        # just binary image to load, size should be less then 64K
+        # mandatory
+
+        labels_file = "tmp/test/main.lbl"
+        # load labels file, for ZSpec handle two formats: 'lbl' from Millfork compiler, and
+        # 'sld' from sjasmplus assembler
+        # optional
+
+        load_addr = 0xC000
+        # memory address to load bin_file, should be less then 0xFFFF-size_of(bin_file)
+        # mandatory
+
+    [[test]]
+        name = "Clear pix area in Spectrum screen (6144 bytes)"
+        # name of test
+        # To skip this particular test, use 'xname'
+
+        # test preconditions
+        a = 0x01
+        d = 0b1110_0001
+        # you can use _ for readability
+        bc = 0x2200
+        hl = 32768
+        hl_ = 42
+        # alternate registers should be with underdash at the end
+        IX = 0
+        iy = 0xFFFF
+        # use any case you want
+
+        # setting registers is optional
+
+        [test.run]
+        # here describe how to run code, mandatory section
+
+        # for better readibility use intendantion as you wish
+
+            fname = "Screen_pix_clear"
+            # you need to set 'fname' with string, name of function to run from labels file
+
+            # or
+
+            call = 0xc000
+            # 'call' with address to run
+            # mandatory
+
+            max_ticks = 400000
+            # how maximum T-States may run given testing function
+            # optional
+
+        [[test.init.memory]]
+            start = 0x4000
+            # address of memory to init
+            # mandatory
+
+            fill = [0xFF, 0x01, 0x00, 0x22]
+            # sequence of bytes/words to store beginning from  'start'
+
+            # or
+
+            file = "path/to/bin/file"
+            # loading binary data at memory starting from 'start'
+
+            # either 'fill' or 'file' is mandatory directive
+
+        [[test.init.memory]]
+            start = 0x57FF
+
+            word = true
+
+            fill = [0xFF00]
+            # if its need to store words instead of bytes use directive 'word' = true
+
+
+        [[test.expect.memory]]
+            address = 0x4000
+
+            value = 0x00
+            # what we expect to read from memory at 'address' after return from function
+
+        [[test.expect.memory]]
+            address = 0x8000
+            word = true
+            fill = [0xDEAD, 0xBEAF]
+            # if its need to compare words instead of bytes use directive 'word' = true
+
+        [test.expect.registers]
+            de = 0x4100
+            a = 0x00
+            flg_z = true
+            flg_c = false
+
+            # check particular register state
+
+        [test.expect.timing]
+            max_ticks = 16150
+
+            # or
+
+            exact_ticks = 12000
+
+            # expectation that given function will be run not more then 'max_ticks' or
+            # exactly 'exact_ticks' T-States
+
+
+    [[test]]
+        # next test...
+
+
+
+
 
 _For more examples, please refer to the [Examples](https://github.com/svenyurgensson/zspec/tree/main/examples)_
 
