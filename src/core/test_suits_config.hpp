@@ -21,6 +21,7 @@ struct TestClear {
 };
 
 struct InitMemory {
+    std::string name;
     int start = -1;
     std::vector<int> fill;
 };
@@ -31,6 +32,7 @@ struct FileInitMemory {
     int offset = -1;
     std::string filename;
     char content[0x10000];
+    std::string name;
 };
 
 struct TestInit {
@@ -60,6 +62,7 @@ struct TestExpectTiming {
 struct TestMemoryState {
     int address = -1;
     int value = -1;
+    std::string name;
 };
 
 struct TestExpectMemory {
@@ -67,6 +70,7 @@ struct TestExpectMemory {
     int address = -1;
     int value = -1;
     int value_not = -1;
+    std::string name;
 };
 
 struct TestExpectPort {

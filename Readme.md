@@ -142,10 +142,10 @@ _For more examples, please refer to the [Examples](https://github.com/svenyurgen
 ## Roadmap
 
 - [ ] Add ability to load binary file for memory comparing expectations
-- [x] Memory series expectations
 - [ ] Add ports expectations
-- [x] Add command line params
 - [ ] More documentation and examples
+- [x] Memory series expectations
+- [x] Add command line params
 
 See the [open issues](https://github.com/svenyurgensson/zspec/issues) for a full list of proposed features (and known issues).
 

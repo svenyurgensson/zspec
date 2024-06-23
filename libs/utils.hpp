@@ -8,7 +8,6 @@
 #include <type_traits>
 #include "toml.hpp"
 
-
 static std::string ssprintf0x00x(uint8_t p) {
    std::stringstream ss;
 
@@ -71,13 +70,16 @@ static inline std::string string_tolower(std::string s) {
     return s;
 }
 
-static inline void fail(std::string str) {
-    std::cerr << Colors::RED << str << Colors::RESET << "\n";
+static inline void fail(std::string str, std::optional<toml::source_region> srcline = {}) {
+    std::cerr << Colors::RED << str << "\n";
+    if (srcline.has_value()) std::cerr << *srcline << "\n";
     exit(1);
 }
 
-static inline void warn(std::string str) {
-    std::cerr << Colors::YELLOW << str << Colors::RESET << "n";
+static inline void warn(std::string str, std::optional<toml::source_region> srcline = {}) {
+    std::cerr << Colors::YELLOW << str << "n";
+    if (srcline.has_value()) std::cerr << *srcline << "\n";
+    std::cerr << Colors::RESET;
 }
 
 static inline void fail_parse_error(toml::parse_error& err) {

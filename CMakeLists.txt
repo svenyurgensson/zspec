@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(REV 1.0.10)
+set(
+REV 1.0.11
+)
 
 add_definitions(-DBUILD_REVISION="${REV}")
 
@@ -12,7 +14,11 @@ project(zspec VERSION ${REV} LANGUAGES CXX)
 set(EXE_NAME zspec)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS off)
-set(CMAKE_CXX_FLAGS "-g3 -O3")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "-g3 -O3 -ferror-limit=1 -ftemplate-backtrace-limit=1")
+else()
+    set(CMAKE_CXX_FLAGS "-g3 -O3")
+endif()
 
 message (${CMAKE_CXX_COMPILER})
 
@@ -21,6 +27,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 add_compile_definitions(TOML_EXCEPTIONS=1)
+add_compile_definitions(TOML_ENABLE_WINDOWS_COMPAT=1)
 
 set(SOURCE_FILES
     src/core/test_spec_executor.cpp
