@@ -132,6 +132,7 @@ Or, instead you could take compiled version from `releases` folder.
 
 ZSpec Toml file with comments:
 
+```toml
     # Init is mandatory section where main test prerequisites should be placed
     [init]
 
@@ -268,8 +269,7 @@ ZSpec Toml file with comments:
 
     [[test]]
         # next test...
-
-
+```
 
 
 
